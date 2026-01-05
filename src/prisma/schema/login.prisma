@@ -1,0 +1,15 @@
+model MagicToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  user_id   Int
+  email     String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [user_id], references: [id])
+  
+  @@index([token])
+  @@index([email])
+  @@map("magic_tokens")
+}
