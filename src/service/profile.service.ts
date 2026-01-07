@@ -1,4 +1,4 @@
-import type { Profile} from "../../dist/generated";
+import type { Profile} from "../generated";
 import type { IProfileRepository } from "../repository/profile.repository"
 
 

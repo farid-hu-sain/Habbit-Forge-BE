@@ -1,4 +1,3 @@
-// services/DashboardService.ts
 import { DashboardRepository } from '../repository/dashboard.repository';
 
 export class DashboardService {

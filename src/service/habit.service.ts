@@ -1,4 +1,4 @@
-import type { Prisma, Habit} from "../../dist/generated";
+import type { Prisma, Habit} from "../generated";
 import type { IHabitRepository } from "../repository/habit.repository"
 
 interface FindAllParams {

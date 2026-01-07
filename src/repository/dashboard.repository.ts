@@ -1,5 +1,4 @@
-// repositories/DashboardRepository.ts
-import { PrismaClient } from "../../dist/generated";
+import { PrismaClient } from "../generated";
 
 export class DashboardRepository {
   constructor(private prisma: PrismaClient) {}

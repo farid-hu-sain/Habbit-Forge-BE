@@ -1,4 +1,3 @@
-// controllers/DashboardController.ts
 import type { Request, Response } from 'express';
 import { DashboardService } from '../service/dashboard.service';
 import { DashboardRepository } from '../repository/dashboard.repository';

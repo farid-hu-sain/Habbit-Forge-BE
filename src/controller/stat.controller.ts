@@ -1,4 +1,3 @@
-// controllers/StatsController.ts - SEMUA DALAM 1 FILE
 import type { Request, Response } from 'express';
 import prismaInstance from '../database';
 
