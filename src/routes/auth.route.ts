@@ -1,18 +1,11 @@
 import { Router } from "express";
 import * as authController from '../controller/auth.controller'
-
+import { authenticate } from "../middleware/auth.middleware"; // ← TAMBAH INI
 
 const router = Router()
 
-router.post('/login', authController.login )
-
+router.post('/login', authController.login)
 router.post('/register', authController.register)
+router.get('/me', authenticate, authController.meController)
 
-router.get('/me', authController.meController)
-
-// untuk log itu urusan FE dengan menambahkan 
-// const logout = () => {
-//   localStorage.removeItem('token');
-//   window.location.href = '/login';
-// };
 export default router

@@ -1,8 +1,8 @@
 // controllers/StatsController.ts - SEMUA DALAM 1 FILE
 import type { Request, Response } from 'express';
-import { PrismaClient } from '../../dist/generated';
+import prismaInstance from '../database';
 
-const prisma = new PrismaClient();
+const prisma = prismaInstance;
 
 export const getHabitStreak = async (req: Request, res: Response) => {
   const userId = req.user?.id;

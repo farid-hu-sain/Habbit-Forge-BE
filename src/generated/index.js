@@ -30,7 +30,7 @@ const {
   Public,
   getRuntime,
   createParam,
-} = require('./runtime/wasm-compiler-edge.js')
+} = require('./runtime/client.js')
 
 
 const Prisma = {}
@@ -81,6 +81,7 @@ Prisma.NullTypes = NullTypes
 
 
 
+  const path = require('path')
 
 /**
  * Enums
@@ -171,22 +172,21 @@ const config = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "model Category {\n  id          String   @id @default(uuid())\n  name        String   @unique\n  description String?\n  color       String?\n  icon        String?\n  createdAt   DateTime @default(now())\n  habit       Habit[]\n\n  @@map(\"categories\")\n}\n\nmodel CheckIn {\n  id        String   @id @default(uuid())\n  habitId   String\n  userId    String\n  date      DateTime // hanya tanggal (time di-set ke 00:00:00)\n  note      String?\n  createdAt DateTime @default(now())\n  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@unique([habitId, date])\n  @@index([userId, date])\n  @@index([habitId])\n  @@map(\"checkins\")\n}\n\nmodel Habit {\n  id          String    @id @default(uuid())\n  title       String\n  description String?\n  isActive    Boolean   @default(true)\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n  userId      String\n  categoryId  String?\n  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)\n  checkIn     CheckIn[]\n\n  @@index([userId])\n  @@index([userId, isActive])\n  @@map(\"habits\")\n}\n\nmodel Profile {\n  id        String   @id @default(uuid())\n  userId    String   @unique\n  fullName  String?\n  bio       String?\n  avatar    String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@map(\"profiles\")\n}\n\nmodel User {\n  id        String    @id @default(uuid())\n  email     String    @unique\n  username  String    @unique\n  password  String\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n  profile   Profile?\n  habit     Habit[]\n  checkIn   CheckIn[]\n\n  @@map(\"users\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../../dist/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n"
+  "inlineSchema": "model Category {\n  id          String   @id @default(uuid())\n  name        String   @unique\n  description String?\n  color       String?\n  icon        String?\n  createdAt   DateTime @default(now())\n  habit       Habit[]\n\n  @@map(\"categories\")\n}\n\nmodel CheckIn {\n  id        String   @id @default(uuid())\n  habitId   String\n  userId    String\n  date      DateTime // hanya tanggal (time di-set ke 00:00:00)\n  note      String?\n  createdAt DateTime @default(now())\n  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@unique([habitId, date])\n  @@index([userId, date])\n  @@index([habitId])\n  @@map(\"checkins\")\n}\n\nmodel Habit {\n  id          String    @id @default(uuid())\n  title       String\n  description String?\n  isActive    Boolean   @default(true)\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n  userId      String\n  categoryId  String?\n  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)\n  checkIn     CheckIn[]\n\n  @@index([userId])\n  @@index([userId, isActive])\n  @@map(\"habits\")\n}\n\nmodel Profile {\n  id        String   @id @default(uuid())\n  userId    String   @unique\n  fullName  String?\n  bio       String?\n  avatar    String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@map(\"profiles\")\n}\n\nmodel User {\n  id        String    @id @default(uuid())\n  email     String    @unique\n  username  String    @unique\n  password  String\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n  profile   Profile?\n  habit     Habit[]\n  checkIn   CheckIn[]\n\n  @@map(\"users\")\n}\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n"
 }
 
 config.runtimeDataModel = JSON.parse("{\"models\":{\"Category\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"color\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"icon\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"habit\",\"kind\":\"object\",\"type\":\"Habit\",\"relationName\":\"CategoryToHabit\"}],\"dbName\":\"categories\"},\"CheckIn\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"habitId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"date\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"note\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"habit\",\"kind\":\"object\",\"type\":\"Habit\",\"relationName\":\"CheckInToHabit\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"CheckInToUser\"}],\"dbName\":\"checkins\"},\"Habit\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"categoryId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"HabitToUser\"},{\"name\":\"category\",\"kind\":\"object\",\"type\":\"Category\",\"relationName\":\"CategoryToHabit\"},{\"name\":\"checkIn\",\"kind\":\"object\",\"type\":\"CheckIn\",\"relationName\":\"CheckInToHabit\"}],\"dbName\":\"habits\"},\"Profile\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fullName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bio\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"avatar\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ProfileToUser\"}],\"dbName\":\"profiles\"},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"profile\",\"kind\":\"object\",\"type\":\"Profile\",\"relationName\":\"ProfileToUser\"},{\"name\":\"habit\",\"kind\":\"object\",\"type\":\"Habit\",\"relationName\":\"HabitToUser\"},{\"name\":\"checkIn\",\"kind\":\"object\",\"type\":\"CheckIn\",\"relationName\":\"CheckInToUser\"}],\"dbName\":\"users\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.compilerWasm = {
-  getRuntime: async () => require('./query_compiler_bg.js'),
-  getQueryCompilerWasmModule: async () => {
-    const loader = (await import('#wasm-compiler-loader')).default
-    const compiler = (await loader).default
-    return compiler
-  }
-}
-if (typeof globalThis !== 'undefined' && globalThis['DEBUG'] || (typeof process !== 'undefined' && process.env && process.env.DEBUG) || undefined) {
-  Debug.enable(typeof globalThis !== 'undefined' && globalThis['DEBUG'] || (typeof process !== 'undefined' && process.env && process.env.DEBUG) || undefined)
-}
+      getRuntime: async () => require('./query_compiler_bg.js'),
+      getQueryCompilerWasmModule: async () => {
+        const { Buffer } = require('node:buffer')
+        const { wasm } = require('./query_compiler_bg.wasm-base64.js')
+        const queryCompilerWasmFileBytes = Buffer.from(wasm, 'base64')
+
+        return new WebAssembly.Module(queryCompilerWasmFileBytes)
+      }
+    }
 
 const PrismaClient = getPrismaClient(config)
 exports.PrismaClient = PrismaClient

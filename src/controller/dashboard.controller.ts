@@ -2,9 +2,9 @@
 import type { Request, Response } from 'express';
 import { DashboardService } from '../service/dashboard.service';
 import { DashboardRepository } from '../repository/dashboard.repository';
-import { PrismaClient } from "../../dist/generated";
+import prismaInstance from '../database';
 
-const prisma = new PrismaClient();
+const prisma = prismaInstance;
 const dashboardRepo = new DashboardRepository(prisma);
 const dashboardService = new DashboardService(dashboardRepo);
 
