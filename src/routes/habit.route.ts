@@ -4,6 +4,11 @@ import { HabitRepository } from "../repository/habit.repository";
 import { HabitService } from "../service/habit.service";
 import { authenticate } from "../middleware/auth.middleware";
 import { checkHabitOwnership } from "../middleware/ownership.middleware";
+import { validate } from "../utils/validation";
+import {
+  createHabitValidation,
+  updateHabitValidation,
+} from "../middleware/habit.validation";
 import prismaInstance from "../database";
 
 const repo = new HabitRepository(prismaInstance);
@@ -51,6 +56,7 @@ const router = Router();
  *       401:
  *         description: Unauthorized
  */
+
 router.get("/", authenticate, controller.getAllHabitHandler);
 
 /**
@@ -95,8 +101,13 @@ router.get("/", authenticate, controller.getAllHabitHandler);
  *       401:
  *         description: Unauthorized
  */
-router.post("/", authenticate, controller.createHabitHandler);
 
+router.post(
+  "/",
+  authenticate,
+  validate(createHabitValidation),
+  controller.createHabitHandler
+);
 /**
  * @swagger
  * /api/habit/{id}:
@@ -123,7 +134,12 @@ router.post("/", authenticate, controller.createHabitHandler);
  *       401:
  *         description: Unauthorized
  */
-router.get("/:id", authenticate, checkHabitOwnership, controller.getHabitByIdHandler);
+router.get(
+  "/:id",
+  authenticate,
+  checkHabitOwnership,
+  controller.getHabitByIdHandler
+);
 
 /**
  * @swagger
@@ -170,7 +186,13 @@ router.get("/:id", authenticate, checkHabitOwnership, controller.getHabitByIdHan
  *       401:
  *         description: Unauthorized
  */
-router.put("/:id", authenticate, checkHabitOwnership, controller.updateHabitHandler);
+router.put(
+  "/:id",
+  authenticate,
+  checkHabitOwnership,
+  validate(updateHabitValidation),
+  controller.updateHabitHandler
+);
 
 /**
  * @swagger
@@ -198,7 +220,12 @@ router.put("/:id", authenticate, checkHabitOwnership, controller.updateHabitHand
  *       401:
  *         description: Unauthorized
  */
-router.delete("/:id", authenticate, checkHabitOwnership, controller.deleteHabitHandler);
+router.delete(
+  "/:id",
+  authenticate,
+  checkHabitOwnership,
+  controller.deleteHabitHandler
+);
 
 /**
  * @swagger
@@ -226,6 +253,11 @@ router.delete("/:id", authenticate, checkHabitOwnership, controller.deleteHabitH
  *       401:
  *         description: Unauthorized
  */
-router.put("/:id/toggle", authenticate, checkHabitOwnership, controller.toggleHabitHandler);
+router.put(
+  "/:id/toggle",
+  authenticate,
+  checkHabitOwnership,
+  controller.toggleHabitHandler
+);
 
 export default router;

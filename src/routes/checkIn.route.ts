@@ -3,10 +3,15 @@ import { CheckInController } from "../controller/checkIn.controller";
 import { CheckInRepository } from "../repository/checkIn.repository";
 import { CheckInService } from "../service/checkIn.service";
 import { authenticate } from "../middleware/auth.middleware";
-import { 
-  checkHabitAccessForCheckIn, 
-  checkCheckInOwnership 
+import {
+  checkHabitAccessForCheckIn,
+  checkCheckInOwnership,
 } from "../middleware/ownership.middleware";
+import { validate } from "../utils/validation";
+import {
+  createCheckInValidation,
+  updateCheckInValidation,
+} from "../middleware/checkIn.validation";
 import prismaInstance from "../database";
 
 const repo = new CheckInRepository(prismaInstance);
@@ -48,7 +53,12 @@ const router = Router();
  *       401:
  *         description: Unauthorized
  */
-router.get("/:id", authenticate, checkCheckInOwnership, controller.getCheckInByIdHandler);
+router.get(
+  "/:id",
+  authenticate,
+  checkCheckInOwnership,
+  controller.getCheckInByIdHandler
+);
 
 /**
  * @swagger
@@ -87,7 +97,13 @@ router.get("/:id", authenticate, checkCheckInOwnership, controller.getCheckInByI
  *       401:
  *         description: Unauthorized
  */
-router.post("/", authenticate, checkHabitAccessForCheckIn, controller.createCheckInHandler);
+router.post(
+  "/",
+  authenticate,
+  validate(createCheckInValidation),
+  checkHabitAccessForCheckIn,
+  controller.createCheckInHandler
+);
 
 /**
  * @swagger
@@ -125,7 +141,13 @@ router.post("/", authenticate, checkHabitAccessForCheckIn, controller.createChec
  *       401:
  *         description: Unauthorized
  */
-router.put("/:id", authenticate, checkCheckInOwnership, controller.updateCheckInHandler);
+router.put(
+  "/:id",
+  authenticate,
+  checkCheckInOwnership,
+  validate(updateCheckInValidation),
+  controller.updateCheckInHandler
+);
 
 /**
  * @swagger
@@ -153,6 +175,11 @@ router.put("/:id", authenticate, checkCheckInOwnership, controller.updateCheckIn
  *       401:
  *         description: Unauthorized
  */
-router.delete("/:id", authenticate, checkCheckInOwnership, controller.deleteCheckInHandler);
+router.delete(
+  "/:id",
+  authenticate,
+  checkCheckInOwnership,
+  controller.deleteCheckInHandler
+);
 
 export default router;

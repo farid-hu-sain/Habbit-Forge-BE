@@ -4,6 +4,8 @@ import { ProfileRepository } from "../repository/profile.repository";
 import { ProfileService } from "../service/profile.service";
 import { authenticate } from "../middleware/auth.middleware";
 import { upload } from "../middleware/upload.middleware";
+import { validate } from "../utils/validation";
+import { updateProfileValidation } from "../middleware/profile.validation";
 import prismaInstance from "../database";
 
 const repo = new ProfileRepository(prismaInstance);
@@ -35,6 +37,7 @@ const router = Router();
  *       401:
  *         description: Unauthorized
  */
+
 router.get("/", authenticate, controller.getProfileByIdHandler);
 
 /**
@@ -72,10 +75,12 @@ router.get("/", authenticate, controller.getProfileByIdHandler);
  *       401:
  *         description: Unauthorized
  */
+
 router.put(
   "/",
   authenticate,
   upload.single("avatar"),
+  validate(updateProfileValidation),
   controller.updateProfileHandler
 );
 

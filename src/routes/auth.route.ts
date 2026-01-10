@@ -1,6 +1,8 @@
 import { Router } from "express";
 import * as authController from '../controller/auth.controller'
 import { authenticate } from "../middleware/auth.middleware";
+import { validate } from "../utils/validation";
+import { registerValidation, loginValidation } from "../middleware/auth.validation";
 
 const router = Router()
 
@@ -50,8 +52,7 @@ const router = Router()
  *       409:
  *         description: Email or username already exists
  */
-router.post('/register', authController.register)
-
+router.post('/register', validate(registerValidation), authController.register)
 /**
  * @swagger
  * /api/auth/login:
@@ -98,8 +99,7 @@ router.post('/register', authController.register)
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', authController.login)
-
+router.post('/login', validate(loginValidation), authController.login)
 /**
  * @swagger
  * /api/auth/me:
@@ -115,5 +115,4 @@ router.post('/login', authController.login)
  *         description: Unauthorized
  */
 router.get('/me', authenticate, authController.meController)
-
 export default router
