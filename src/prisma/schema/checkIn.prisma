@@ -2,7 +2,7 @@ model CheckIn {
   id        String    @id @default(uuid())
   habitId   String
   userId    String
-  date      DateTime  // hanya tanggal (time di-set ke 00:00:00)
+  date      DateTime  
   note      String?
   createdAt DateTime  @default(now())
   
@@ -12,9 +12,14 @@ model CheckIn {
   
   // PENTING: 1 check-in per hari per habit
   @@unique([habitId, date])
+<<<<<<< HEAD
   @@index([userId, date DESC])          // Dashboard query
   @@index([habitId, date DESC])         // Streak calculation
   @@index([date])                       // Monthly stats
   
+=======
+  @@index([userId, date])               
+  @@index([habitId])
+>>>>>>> punyaku
   @@map("checkins")
 }

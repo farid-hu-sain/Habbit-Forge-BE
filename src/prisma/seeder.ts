@@ -1,5 +1,5 @@
 // prisma/seed.ts
-import prismaInstance from '../prisma'
+import prismaInstance from '../database'
 import { hash } from 'bcrypt'
 
 const prisma = prismaInstance

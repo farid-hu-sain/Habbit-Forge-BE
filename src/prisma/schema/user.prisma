@@ -6,8 +6,8 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   profile   Profile?
-  habits    Habit[]
-  checkIns  CheckIn[]
+  habit    Habit[]
+  checkIn  CheckIn[]
   
   @@map("users")
 }

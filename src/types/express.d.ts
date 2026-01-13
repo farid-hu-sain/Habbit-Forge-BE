@@ -4,11 +4,11 @@ declare global {
   namespace Express {
     interface Request {
       startTime?: number;
-      apikey?: string;
       user?: {
-        id: number;
-        role: string;
-      }
+        id: string;
+        email?: string;
+        username?: string;
+      };
     }
   }
 }

@@ -12,7 +12,7 @@ model Habit {
   categoryId  String?
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  checkIns    CheckIn[]
+  checkIn    CheckIn[]
   
   @@index([userId])
   @@index([userId, isActive])

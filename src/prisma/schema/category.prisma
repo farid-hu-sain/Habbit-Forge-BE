@@ -5,7 +5,7 @@ model Category {
   color       String?  
   icon        String? 
   createdAt   DateTime  @default(now())
-  habits      Habit[]
+  habit      Habit[]
   
   @@map("categories")
 }
