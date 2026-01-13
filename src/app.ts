@@ -18,12 +18,14 @@ import testRoutes from './routes/test.route'
 
 const app: Application = express()
 
-app.use(cors({
-  origin: "*", 
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-frontend-domain.com'] 
+    : '*', 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
-}));
+};
 
 app.use(helmet())
 app.use(morgan("dev"))
@@ -31,6 +33,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+app.use(cors(corsOptions));
 
 app.get('/', (_req: Request, res: Response) => {
   successResponse(res, "Selamat datang di API Habit Forge", {
