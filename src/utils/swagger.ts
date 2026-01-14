@@ -1,5 +1,4 @@
 import swaggerJSDoc from "swagger-jsdoc";
-import config from "./env";
 
 const option: swaggerJSDoc.Options = {
   definition: {
@@ -11,7 +10,7 @@ const option: swaggerJSDoc.Options = {
     },
     servers: [
       {
-        url: `http://localhost:${config.PORT}/api`,
+        url: `https://habbit-forge-be-production.up.railway.app/api`,
         description: "Development server",
       },
     ],
