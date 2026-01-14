@@ -1,8 +1,8 @@
 // tests/dashboard.test.ts
 import request from "supertest";
-import app from "../app.js";
+import app from "../app";
 import jwt from "jsonwebtoken";
-import config from "../utils/env.js";
+import config from "../utils/env";
 describe("GET /api/dashboard", () => {
     const token = jwt.sign({ id: "user-123" }, config.JWT_SECRET);
     it("should return 200 and dashboard data", async () => {

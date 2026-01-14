@@ -1,6 +1,6 @@
 import express from "express";
-import { getHabitStreak, getMonthlyStats } from "../controller/stat.controller.js";
-import { authenticate } from "../middleware/auth.middleware.js";
+import { getHabitStreak, getMonthlyStats } from "../controller/stat.controller";
+import { authenticate } from "../middleware/auth.middleware";
 const router = express.Router();
 /**
  * @swagger

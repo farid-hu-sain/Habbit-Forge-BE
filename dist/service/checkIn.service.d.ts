@@ -1,5 +1,5 @@
-import type { CheckIn } from "../../dist/generated/index.js";
-import type { ICheckInRepository } from "../repository/checkIn.repository.js";
+import type { CheckIn } from "../../dist/generated";
+import type { ICheckInRepository } from "../repository/checkIn.repository";
 export interface ICheckInService {
     getCheckInById(id: string, userId: string): Promise<CheckIn>;
     createCheckIn(data: {

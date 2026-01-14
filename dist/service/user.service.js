@@ -1,7 +1,7 @@
-import prisma from "../database.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import config from "../utils/env.js";
+import prisma from "../database";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import config from '../utils/env';
 export class UserService {
     async register(data) {
         const existingUser = await prisma.user.findUnique({
@@ -67,8 +67,8 @@ export class UserService {
             id: userId,
             email: email,
             username: username,
-            role: "user"
-        }, config.JWT_SECRET, { expiresIn: "7d" });
+            role: 'user'
+        }, config.JWT_SECRET, { expiresIn: '7d' });
     }
     formatUserResponse(user) {
         return {

@@ -1,6 +1,6 @@
-import prisma from "../database.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { successResponse } from "../utils/response.js";
+import prisma from "../database";
+import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/response";
 export const getHabitStreak = asyncHandler(async (req, res) => {
     const userId = req.user?.id;
     const habitId = req.params.id;

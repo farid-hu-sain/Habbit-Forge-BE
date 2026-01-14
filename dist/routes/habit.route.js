@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { HabitController } from "../controller/habit.controller.js";
-import { HabitRepository } from "../repository/habit.repository.js";
-import { HabitService } from "../service/habit.service.js";
-import { authenticate } from "../middleware/auth.middleware.js";
-import { validate } from "../utils/validation.js";
-import { createHabitValidation, updateHabitValidation } from "../middleware/habit.validation.js";
-import prismaInstance from "../database.js";
+import { HabitController } from "../controller/habit.controller";
+import { HabitRepository } from "../repository/habit.repository";
+import { HabitService } from "../service/habit.service";
+import { authenticate } from "../middleware/auth.middleware";
+import { validate } from "../utils/validation";
+import { createHabitValidation, updateHabitValidation } from "../middleware/habit.validation";
+import prismaInstance from "../database";
 const repo = new HabitRepository(prismaInstance);
 const service = new HabitService(repo);
 const controller = new HabitController(service);

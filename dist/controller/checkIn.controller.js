@@ -1,5 +1,5 @@
-import { successResponse } from "../utils/response.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { successResponse } from "../utils/response";
+import { asyncHandler } from "../utils/asyncHandler";
 export class CheckInController {
     checkInService;
     constructor(checkInService) {

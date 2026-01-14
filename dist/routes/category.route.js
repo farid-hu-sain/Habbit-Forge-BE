@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { CategoryController } from "../controller/category.controller.js";
-import { CategoryRepository } from "../repository/category.repository.js";
-import { CategoryService } from "../service/category.service.js";
-import { authenticate } from "../middleware/auth.middleware.js";
-import prismaInstance from "../database.js";
+import { CategoryController } from "../controller/category.controller";
+import { CategoryRepository } from "../repository/category.repository";
+import { CategoryService } from "../service/category.service";
+import { authenticate } from "../middleware/auth.middleware";
+import prismaInstance from "../database";
 const repo = new CategoryRepository(prismaInstance);
 const service = new CategoryService(repo);
 const controller = new CategoryController(service);

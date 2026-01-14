@@ -1,4 +1,4 @@
-import prisma from "../database.js";
+import prisma from "../database";
 export class CheckInService {
     checkInRepo;
     constructor(checkInRepo) {

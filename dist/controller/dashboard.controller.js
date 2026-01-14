@@ -1,8 +1,8 @@
-import { DashboardService } from "../service/dashboard.service.js";
-import { DashboardRepository } from "../repository/dashboard.repository.js";
-import prismaInstance from "../database.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { successResponse } from "../utils/response.js";
+import { DashboardService } from "../service/dashboard.service";
+import { DashboardRepository } from "../repository/dashboard.repository";
+import prismaInstance from "../database";
+import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/response";
 const prisma = prismaInstance;
 const dashboardRepo = new DashboardRepository(prisma);
 const dashboardService = new DashboardService(dashboardRepo);

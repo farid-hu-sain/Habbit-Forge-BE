@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { ICheckInService } from "../service/checkIn.service.js";
+import type { ICheckInService } from "../service/checkIn.service";
 export declare class CheckInController {
     private checkInService;
     constructor(checkInService: ICheckInService);

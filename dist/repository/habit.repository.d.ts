@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient, Habit } from "../../dist/generated/index.js";
+import type { Prisma, PrismaClient, Habit } from "../../dist/generated";
 export interface IHabitRepository {
     list(skip: number, take: number, where: Prisma.HabitWhereInput, orderBy: Prisma.HabitOrderByWithRelationInput): Promise<Habit[]>;
     countAll(where: Prisma.HabitWhereInput): Promise<number>;

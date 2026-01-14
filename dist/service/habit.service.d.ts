@@ -1,5 +1,5 @@
-import type { Habit } from "../../dist/generated/index.js";
-import type { IHabitRepository } from "../repository/habit.repository.js";
+import type { Habit } from "../../dist/generated";
+import type { IHabitRepository } from "../repository/habit.repository";
 interface FindAllParams {
     page: number;
     limit: number;

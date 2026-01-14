@@ -1,6 +1,6 @@
-import { successResponse } from "../utils/response.js";
-import { UserService } from "../service/user.service.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { successResponse } from "../utils/response";
+import { UserService } from "../service/user.service";
+import { asyncHandler } from "../utils/asyncHandler";
 export class UserController {
     userService;
     constructor(userService) {

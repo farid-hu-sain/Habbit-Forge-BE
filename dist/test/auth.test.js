@@ -1,7 +1,7 @@
 import request from "supertest";
-import app from "../app.js";
+import app from "../app";
 import jwt from "jsonwebtoken";
-import config from "../utils/env.js";
+import config from "../utils/env";
 describe("Auth API with Fixed Middleware", () => {
     // Helper untuk data unik
     function getUniqueTestData() {
@@ -19,7 +19,7 @@ describe("Auth API with Fixed Middleware", () => {
             const res = await request(app)
                 .post("/api/auth/register")
                 .send(testData)
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
             console.log("Register - Status:", res.status);
             console.log("Register - Response:", res.body);
             expect(res.statusCode).toEqual(201);
@@ -31,7 +31,7 @@ describe("Auth API with Fixed Middleware", () => {
             await request(app)
                 .post("/api/auth/register")
                 .send(testData)
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
             // Register kedua dengan email sama
             const res = await request(app)
                 .post("/api/auth/register")
@@ -39,7 +39,7 @@ describe("Auth API with Fixed Middleware", () => {
                 ...testData,
                 username: `different${Date.now()}`
             })
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
             console.log("Duplicate email - Status:", res.status);
             console.log("Duplicate email - Message:", res.body?.message);
             expect(res.statusCode).toEqual(400);
@@ -53,7 +53,7 @@ describe("Auth API with Fixed Middleware", () => {
             await request(app)
                 .post("/api/auth/register")
                 .send(testData)
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
         });
         it("should return 200 and login token", async () => {
             const res = await request(app)
@@ -62,7 +62,7 @@ describe("Auth API with Fixed Middleware", () => {
                 email: testData.email,
                 password: testData.password
             })
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
             console.log("Login success - Status:", res.status);
             expect(res.statusCode).toEqual(200);
             expect(res.body.success).toBe(true);
@@ -75,7 +75,7 @@ describe("Auth API with Fixed Middleware", () => {
                 email: testData.email,
                 password: "wrongpassword"
             })
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
             console.log("Wrong password - Status:", res.status);
             console.log("Wrong password - Message:", res.body?.message);
             expect([400, 401]).toContain(res.statusCode);
@@ -89,7 +89,7 @@ describe("Auth API with Fixed Middleware", () => {
                 email: "nonexistent@example.com",
                 password: "anypassword"
             })
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
             console.log("Non-existent email - Status:", res.status);
             expect([400, 401]).toContain(res.statusCode);
             expect(res.body.success).toBe(false);
@@ -103,14 +103,14 @@ describe("Auth API with Fixed Middleware", () => {
             await request(app)
                 .post("/api/auth/register")
                 .send(testData)
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
             const loginRes = await request(app)
                 .post("/api/auth/login")
                 .send({
                 email: testData.email,
                 password: testData.password
             })
-                .set("Content-Type", "application/json");
+                .set('Content-Type', 'application/json');
             validToken = loginRes.body.data?.token;
             // Fallback jika token tidak ada
             if (!validToken) {

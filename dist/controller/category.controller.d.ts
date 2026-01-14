@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { ICategoryService } from "../service/category.service.js";
+import type { ICategoryService } from "../service/category.service";
 export declare class CategoryController {
     private categoryService;
     constructor(categoryService: ICategoryService);

@@ -1,26 +1,19 @@
-import { PrismaClient } from "../../dist/generated/index.js";
+import { PrismaClient } from "../../dist/generated";
 export declare class DashboardRepository {
     private prisma;
     constructor(prisma: PrismaClient);
     getDashboard(userId: string): Promise<{
-        totalHabits: number;
-        activeHabits: number;
-        totalCheckIns: number;
+        totalHabits: any;
+        activeHabits: any;
+        totalCheckIns: any;
         streak: number;
     }>;
-    getTodayHabits(userId: string): Promise<{
-        id: string;
-        title: string;
-        description: string | null;
-        category: string;
-        isCompleted: boolean;
-        checkInTime: Date | null;
-    }[]>;
+    getTodayHabits(userId: string): Promise<any>;
     getStats(userId: string): Promise<{
         habitsByCategory: Record<string, number>;
         last7Days: {
             date: string | undefined;
-            checkIns: number;
+            checkIns: any;
         }[];
         monthlyCompletion: number;
     }>;

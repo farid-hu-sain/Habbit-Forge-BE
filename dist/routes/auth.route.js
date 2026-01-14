@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { login, register } from "../controller/auth.controller.js";
-import { validate } from "../utils/validation.js";
-import { loginValidation, registerValidation } from "../middleware/auth.validation.js";
+import { login, register } from '../controller/auth.controller';
+import { validate } from "../utils/validation";
+import { loginValidation, registerValidation } from "../middleware/auth.validation";
 const router = Router();
 /**
  * @swagger
@@ -39,7 +39,7 @@ const router = Router();
  *       409:
  *         description: Email or username already exists
  */
-router.post("/register", validate(registerValidation), register);
+router.post('/register', validate(registerValidation), register);
 /**
  * @swagger
  * /auth/login:
@@ -68,6 +68,6 @@ router.post("/register", validate(registerValidation), register);
  *       401:
  *         description: Invalid credentials
  */
-router.post("/login", validate(loginValidation), login);
+router.post('/login', validate(loginValidation), login);
 export default router;
 //# sourceMappingURL=auth.route.js.map

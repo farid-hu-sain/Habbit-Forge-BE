@@ -1,4 +1,4 @@
-import { UserService } from "./user.service.js";
+import { UserService } from "./user.service";
 const userService = new UserService();
 export const register = userService.register.bind(userService);
 export const login = userService.login.bind(userService);
