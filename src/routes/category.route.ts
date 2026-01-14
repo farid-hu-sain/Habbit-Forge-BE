@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/category:
+ * /category:
  *   get:
  *     summary: Get all categories
  *     tags: [Categories]
@@ -46,7 +46,7 @@ router.get("/", authenticate, controller.getAllCategoryHandler);
 
 /**
  * @swagger
- * /api/category/{id}:
+ * /category/{id}:
  *   get:
  *     summary: Get category by ID
  *     tags: [Categories]

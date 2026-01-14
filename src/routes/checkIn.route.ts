@@ -15,7 +15,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/checkIn/{id}:
+ * /checkIn/{id}:
  *   get:
  *     summary: Get check-in by ID
  *     tags: [CheckIns]
@@ -38,7 +38,7 @@ router.get("/:id", authenticate, controller.getCheckInByIdHandler);
 
 /**
  * @swagger
- * /api/checkIn:
+ * /checkIn:
  *   post:
  *     summary: Create daily check-in
  *     tags: [CheckIns]
@@ -71,7 +71,7 @@ router.post("/", authenticate, validate(createCheckInValidation), controller.cre
 
 /**
  * @swagger
- * /api/checkIn/{id}:
+ * /checkIn/{id}:
  *   put:
  *     summary: Update check-in note
  *     tags: [CheckIns]
@@ -103,7 +103,7 @@ router.put("/:id", authenticate, validate(updateCheckInValidation), controller.u
 
 /**
  * @swagger
- * /api/checkIn/{id}:
+ * /checkIn/{id}:
  *   delete:
  *     summary: Delete check-in
  *     tags: [CheckIns]

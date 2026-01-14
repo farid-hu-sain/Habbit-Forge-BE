@@ -15,7 +15,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/habit:
+ * /habit:
  *   get:
  *     summary: Get all habits for current user
  *     tags: [Habits]
@@ -50,7 +50,7 @@ router.get("/", authenticate, controller.getAllHabitHandler);
 
 /**
  * @swagger
- * /api/habit:
+ * /habit:
  *   post:
  *     summary: Create new habit
  *     tags: [Habits]
@@ -88,7 +88,7 @@ router.post("/", authenticate, validate(createHabitValidation), controller.creat
 
 /**
  * @swagger
- * /api/habit/{id}:
+ * /habit/{id}:
  *   get:
  *     summary: Get habit by ID
  *     tags: [Habits]
@@ -111,7 +111,7 @@ router.get("/:id", authenticate, controller.getHabitByIdHandler);
 
 /**
  * @swagger
- * /api/habit/{id}:
+ * /habit/{id}:
  *   put:
  *     summary: Update habit
  *     tags: [Habits]
@@ -152,7 +152,7 @@ router.put("/:id", authenticate, validate(updateHabitValidation), controller.upd
 
 /**
  * @swagger
- * /api/habit/{id}:
+ * /habit/{id}:
  *   delete:
  *     summary: Delete habit (soft delete)
  *     tags: [Habits]
@@ -175,7 +175,7 @@ router.delete("/:id", authenticate, controller.deleteHabitHandler);
 
 /**
  * @swagger
- * /api/habit/{id}/toggle:
+ * /habit/{id}/toggle:
  *   put:
  *     summary: Toggle habit active status
  *     tags: [Habits]

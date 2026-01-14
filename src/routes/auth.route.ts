@@ -7,7 +7,7 @@ const router = Router()
 
 /**
  * @swagger
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     summary: Register new user
  *     tags: [Authentication]
@@ -45,7 +45,7 @@ router.post('/register', validate(registerValidation), register)
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Login user
  *     tags: [Authentication]

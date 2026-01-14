@@ -10,7 +10,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/user/me:
+ * /user/me:
  *   get:
  *     summary: Get current user profile
  *     tags: [User]

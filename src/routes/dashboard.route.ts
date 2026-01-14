@@ -10,7 +10,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/dashboard:
+ * /dashboard:
  *   get:
  *     summary: Get dashboard overview
  *     tags: [Dashboard]
@@ -24,7 +24,7 @@ router.get("/", authenticate, getDashboard);
 
 /**
  * @swagger
- * /api/dashboard/today:
+ * /dashboard/today:
  *   get:
  *     summary: Get today's habits with check-in status
  *     tags: [Dashboard]
@@ -38,7 +38,7 @@ router.get("/today", authenticate, getTodayHabits);
 
 /**
  * @swagger
- * /api/dashboard/stats:
+ * /dashboard/stats:
  *   get:
  *     summary: Get detailed statistics
  *     tags: [Dashboard]

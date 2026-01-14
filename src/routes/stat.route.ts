@@ -6,7 +6,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/stat/habits/{id}/streak:
+ * /stat/habits/{id}/streak:
  *   get:
  *     summary: Get habit streak
  *     tags: [Statistics]
@@ -29,7 +29,7 @@ router.get("/habits/:id/streak", authenticate, getHabitStreak);
 
 /**
  * @swagger
- * /api/stat/monthly:
+ * /stat/monthly:
  *   get:
  *     summary: Get monthly statistics
  *     tags: [Statistics]

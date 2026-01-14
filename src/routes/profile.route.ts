@@ -16,7 +16,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/profile:
+ * /profile:
  *   get:
  *     summary: Get current user profile
  *     tags: [Profile]
@@ -32,7 +32,7 @@ router.get("/", authenticate, controller.getProfileByIdHandler);
 
 /**
  * @swagger
- * /api/profile:
+ * /profile:
  *   put:
  *     summary: Update user profile
  *     tags: [Profile]
