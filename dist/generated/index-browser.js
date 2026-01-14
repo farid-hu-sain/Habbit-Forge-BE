@@ -138,10 +138,25 @@ exports.Prisma.CheckInScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.DailyStatsScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  totalHabits: 'totalHabits',
+  completedHabits: 'completedHabits',
+  totalCheckIns: 'totalCheckIns',
+  streak: 'streak',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.HabitScalarFieldEnum = {
   id: 'id',
   title: 'title',
   description: 'description',
+  currentStreak: 'currentStreak',
+  longestStreak: 'longestStreak',
+  lastCheckIn: 'lastCheckIn',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -187,6 +202,7 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   Category: 'Category',
   CheckIn: 'CheckIn',
+  DailyStats: 'DailyStats',
   Habit: 'Habit',
   Profile: 'Profile',
   User: 'User'
