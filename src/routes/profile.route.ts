@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { ProfileController } from "../controller/profile.controller";
-import { ProfileRepository } from "../repository/profile.repository";
-import { ProfileService } from "../service/profile.service";
-import { authenticate } from "../middleware/auth.middleware";
-import { upload } from "../middleware/upload.middleware";
-import { validate } from "../utils/validation";
-import { updateProfileValidation } from "../middleware/profile.validation";
-import prismaInstance from "../database";
+import { ProfileController } from "../controller/profile.controller.js";
+import { ProfileRepository } from "../repository/profile.repository.js";
+import { ProfileService } from "../service/profile.service.js";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { upload } from "../middleware/upload.middleware.js";
+import { validate } from "../utils/validation.js";
+import { updateProfileValidation } from "../middleware/profile.validation.js";
+import prismaInstance from "../database.js";
 
 const repo = new ProfileRepository(prismaInstance);
 const service = new ProfileService(repo);

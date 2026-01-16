@@ -1,7 +1,7 @@
 import request from "supertest";
-import app from "../app";
+import app from "../app.js";
 import jwt from "jsonwebtoken";
-import config from "../utils/env";
+import config from "../utils/env.js";
 
 describe("POST /api/habit/:id/checkin", () => {
   const token = jwt.sign({ id: "user-checkin-123" }, config.JWT_SECRET);

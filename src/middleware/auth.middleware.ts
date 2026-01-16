@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
-import { errorResponse } from "../utils/response";
-import config from "../utils/env";
+import { errorResponse } from "../utils/response.js";
+import config from "../utils/env.js";
 
 export const authenticate = (
   req: Request,

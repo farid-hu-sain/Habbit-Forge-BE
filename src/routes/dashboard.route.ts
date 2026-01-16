@@ -3,8 +3,8 @@ import {
   getDashboard,
   getTodayHabits,
   getStats,
-} from "../controller/dashboard.controller";
-import { authenticate } from "../middleware/auth.middleware";
+} from "../controller/dashboard.controller.js";
+import { authenticate } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 

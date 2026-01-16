@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { successResponse } from "../utils/response";
-import type { ICheckInService } from "../service/checkIn.service";
-import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/response.js";
+import type { ICheckInService } from "../service/checkIn.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export class CheckInController {
   constructor(private checkInService: ICheckInService) {}

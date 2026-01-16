@@ -1,7 +1,7 @@
-import prisma from "../database";
+import prisma from "../database.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import config from '../utils/env';
+import config from '../utils/env.js';
 
 export interface RegisterData {
   username: string;

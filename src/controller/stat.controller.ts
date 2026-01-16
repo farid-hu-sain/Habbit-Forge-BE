@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import prisma from "../database";
-import { asyncHandler } from "../utils/asyncHandler";
-import { successResponse } from "../utils/response";
+import prisma from "../database.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { successResponse } from "../utils/response.js";
 
 export const getHabitStreak = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?.id;

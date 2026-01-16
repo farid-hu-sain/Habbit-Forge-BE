@@ -1,4 +1,4 @@
-import { DashboardRepository } from "../repository/dashboard.repository";
+import { DashboardRepository } from "../repository/dashboard.repository.js";
 
 export class DashboardService {
   constructor(private dashboardRepo: DashboardRepository) {}

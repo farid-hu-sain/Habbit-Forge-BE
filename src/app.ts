@@ -3,17 +3,17 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
-import { errorHandler } from './middleware/error.handler';
-import swaggerSpec from './utils/swagger';
-import { successResponse } from './utils/response';
-import authRoutes from './routes/auth.route';
-import userRoutes from './routes/user.route';
-import categoryRoutes from './routes/category.route';
-import habitRoutes from './routes/habit.route';
-import checkInRoutes from './routes/checkIn.route';
-import profileRoutes from './routes/profile.route';
-import dashboardRoutes from './routes/dashboard.route';
-import statRoutes from './routes/stat.route';
+import { errorHandler } from './middleware/error.handler.js';
+import swaggerSpec from './utils/swagger.js';
+import { successResponse } from './utils/response.js';
+import authRoutes from './routes/auth.route.js';
+import userRoutes from './routes/user.route.js';
+import categoryRoutes from './routes/category.route.js';
+import habitRoutes from './routes/habit.route.js';
+import checkInRoutes from './routes/checkIn.route.js';
+import profileRoutes from './routes/profile.route.js';
+import dashboardRoutes from './routes/dashboard.route.js';
+import statRoutes from './routes/stat.route.js';
 
 const app: Application = express();
 

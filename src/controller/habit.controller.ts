@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { successResponse } from "../utils/response";
-import type { IHabitService } from "../service/habit.service";
-import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/response.js";
+import type { IHabitService } from "../service/habit.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export class HabitController {
   constructor(private habitService: IHabitService) {}

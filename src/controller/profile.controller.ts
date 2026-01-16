@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { successResponse } from "../utils/response";
-import type { IProfileService } from "../service/profile.service";
-import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/response.js";
+import type { IProfileService } from "../service/profile.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export class ProfileController {
   constructor(private profileService: IProfileService) {}

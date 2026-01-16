@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { CheckInController } from "../controller/checkIn.controller";
-import { CheckInRepository } from "../repository/checkIn.repository";
-import { CheckInService } from "../service/checkIn.service";
-import { authenticate } from "../middleware/auth.middleware";
-import { validate } from "../utils/validation";
-import { createCheckInValidation, updateCheckInValidation } from "../middleware/checkIn.validation";
-import prismaInstance from "../database";
+import { CheckInController } from "../controller/checkIn.controller.js";
+import { CheckInRepository } from "../repository/checkIn.repository.js";
+import { CheckInService } from "../service/checkIn.service.js";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { validate } from "../utils/validation.js";
+import { createCheckInValidation, updateCheckInValidation } from "../middleware/checkIn.validation.js";
+import prismaInstance from "../database.js";
 
 const repo = new CheckInRepository(prismaInstance);
 const service = new CheckInService(repo);

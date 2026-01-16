@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { successResponse } from "../utils/response";
-import type { ICategoryService } from "../service/category.service";
-import { asyncHandler } from "../utils/asyncHandler";
+import { successResponse } from "../utils/response.js";
+import type { ICategoryService } from "../service/category.service.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export class CategoryController {
   constructor(private categoryService: ICategoryService) {}

@@ -1,7 +1,7 @@
 import request from "supertest";
-import app from "../app";
+import app from "../app.js";
 import jwt from "jsonwebtoken";
-import config from "../utils/env";
+import config from "../utils/env.js";
 
 describe("Auth API with Fixed Middleware", () => {
   // Helper untuk data unik

@@ -1,5 +1,5 @@
-import type { Profile } from "../../dist/generated";
-import type { IProfileRepository } from "../repository/profile.repository";
+import type { Profile } from "../../dist/generated/index.js";
+import type { IProfileRepository } from "../repository/profile.repository.js";
 
 export interface IProfileService {
   getProfileByUserId(userId: string): Promise<Profile>;

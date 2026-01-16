@@ -1,8 +1,8 @@
 // tests/profile.test.ts
 import request from "supertest";
-import app from "../app";
+import app from "../app.js";
 import jwt from "jsonwebtoken";
-import config from "../utils/env";
+import config from "../utils/env.js";
 import path from "path";
 
 describe("GET /api/profile", () => {
