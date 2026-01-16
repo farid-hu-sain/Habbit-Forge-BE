@@ -42,6 +42,6 @@
     "skipLibCheck": true,
     "esModuleInterop": true
   },
-  "include": ["src", "dist/generated","../generated"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }

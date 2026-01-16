@@ -2,7 +2,7 @@
   "name": "database-habbits",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "postinstall": "npm run prisma:generate",
     "prisma:generate": "prisma generate",
