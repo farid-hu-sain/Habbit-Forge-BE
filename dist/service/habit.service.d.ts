@@ -1,4 +1,4 @@
-import type { Habit } from "../../dist/generated/index.js";
+import type { Habit } from "@prisma/client";
 import type { IHabitRepository } from "../repository/habit.repository.js";
 interface FindAllParams {
     page: number;

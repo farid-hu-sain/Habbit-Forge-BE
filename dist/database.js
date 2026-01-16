@@ -1,7 +1,7 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import config from "./utils/env.js";
-import { PrismaClient } from "../dist/generated/index.js";
+import { PrismaClient } from "@prisma/client";
 let prisma;
 const getPrisma = () => {
     if (!prisma) {

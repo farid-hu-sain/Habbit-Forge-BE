@@ -1,4 +1,4 @@
-import type { Profile } from "../../dist/generated/index.js";
+import type { Profile } from "@prisma/client";
 import type { IProfileRepository } from "../repository/profile.repository.js";
 export interface IProfileService {
     getProfileByUserId(userId: string): Promise<Profile>;

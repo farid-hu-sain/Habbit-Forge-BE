@@ -1,4 +1,4 @@
-import type { CheckIn } from "../../dist/generated/index.js";
+import type { CheckIn } from "@prisma/client";
 import type { ICheckInRepository } from "../repository/checkIn.repository.js";
 export interface ICheckInService {
     getCheckInById(id: string, userId: string): Promise<CheckIn>;

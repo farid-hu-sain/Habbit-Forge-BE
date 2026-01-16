@@ -1,4 +1,4 @@
-import { PrismaClient } from "../../dist/generated/index.js";
+import { PrismaClient } from "@prisma/client";
 export class DashboardRepository {
     prisma;
     constructor(prisma) {
@@ -51,7 +51,7 @@ export class DashboardRepository {
             id: habit.id,
             title: habit.title,
             description: habit.description,
-            category: habit.category?.name || "No category",
+            category: habit.category?.name || 'No category',
             isCompleted: habit.checkIn.length > 0, // Sudah check-in hari ini
             checkInTime: habit.checkIn[0]?.createdAt || null
         }));
@@ -65,7 +65,7 @@ export class DashboardRepository {
         });
         const habitsByCategory = {};
         habits.forEach(habit => {
-            const categoryName = habit.category?.name || "Uncategorized";
+            const categoryName = habit.category?.name || 'Uncategorized';
             habitsByCategory[categoryName] = (habitsByCategory[categoryName] || 0) + 1;
         });
         // 2. Progress 7 hari terakhir
@@ -84,7 +84,7 @@ export class DashboardRepository {
                 }
             });
             last7Days.push({
-                date: date.toISOString().split("T")[0], // Format: YYYY-MM-DD
+                date: date.toISOString().split('T')[0], // Format: YYYY-MM-DD
                 checkIns
             });
         }

@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient, CheckIn } from "../../dist/generated";
+import type { Prisma, PrismaClient, CheckIn } from "@prisma/client";
 
 export interface ICheckInRepository {
   list(
