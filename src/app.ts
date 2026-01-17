@@ -1,6 +1,6 @@
 import express, { type Application, type Request, type Response, type NextFunction } from "express";
 import cors from 'cors';
-import morgan from 'morgan';
+import * as morgan from 'morgan';
 import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from './middleware/error.handler.js';
@@ -25,7 +25,7 @@ app.use(cors({
 }));
 
 app.use(helmet());
-app.use(morgan('dev'));
+app.use((morgan as any)("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
