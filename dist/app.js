@@ -21,6 +21,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
+// @ts-ignore
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
