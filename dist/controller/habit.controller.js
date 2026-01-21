@@ -1,5 +1,6 @@
 import { successResponse } from "../utils/response.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { Frequency } from "@prisma/client";
 export class HabitController {
     habitService;
     constructor(habitService) {
@@ -44,15 +45,28 @@ export class HabitController {
         const userId = req.user?.id;
         if (!userId)
             throw new Error("Unauthorized");
-        const { title, description, isActive, categoryId } = req.body;
+        const { title, description, isActive, categoryId, startDate, frequency } = req.body;
         if (!title)
             throw new Error("Title diperlukan");
+        if (!startDate)
+            throw new Error("startDate diperlukan");
+        if (!frequency)
+            throw new Error("frequency diperlukan");
+        const normalizedStartDate = new Date(`${startDate}T00:00:00Z`);
+        if (isNaN(normalizedStartDate.getTime())) {
+            throw new Error("Format startDate tidak valid (YYYY-MM-DD)");
+        }
+        if (!Object.values(Frequency).includes(frequency)) {
+            throw new Error("Frequency tidak valid");
+        }
         const habit = await this.habitService.createHabit({
             title,
             description,
             isActive,
             userId,
             categoryId,
+            startDate,
+            frequency
         });
         successResponse(res, "Habit berhasil dibuat", habit, null, 201);
     });

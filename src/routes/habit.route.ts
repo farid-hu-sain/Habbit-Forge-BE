@@ -78,6 +78,18 @@ router.get("/", authenticate, controller.getAllHabitHandler);
  *               categoryId:
  *                 type: string
  *                 format: uuid
+ *               startDate: 
+ *                 type : string
+ *                 format: date-time
+ *                 example: "2026-01-01T00:00:00Z"
+ *               frequency: 
+ *                  type: string
+ *                  enum : 
+ *                   - DAILY
+ *                   - WEEKLY
+ *                   - MONTHLY
+ *                   - YEARLY
+ *               
  *     responses:
  *       201:
  *         description: Habit created successfully
@@ -142,6 +154,17 @@ router.get("/:id", authenticate, controller.getHabitByIdHandler);
  *               categoryId:
  *                 type: string
  *                 format: uuid
+ *               startDate: 
+ *                 type : string
+ *                 format: date-time
+ *                 example: "2026-01-01T00:00:00Z"
+ *               frequency: 
+ *                  type: string
+ *                  enum : 
+ *                   - DAILY
+ *                   - WEEKLY
+ *                   - MONTHLY
+ *                   - YEARLY
  *     responses:
  *       200:
  *         description: Habit updated successfully

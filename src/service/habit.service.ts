@@ -1,4 +1,4 @@
-import type { Prisma, Habit } from "@prisma/client";
+import type { Prisma, Habit, Frequency } from "@prisma/client";
 import type { IHabitRepository } from "../repository/habit.repository.js";
 
 interface FindAllParams {
@@ -27,6 +27,8 @@ export interface IHabitService {
     isActive?: boolean;
     userId: string;
     categoryId?: string;
+    startDate: string
+    frequency: Frequency
   }): Promise<Habit>;
   updateHabit(id: string, data: Partial<Habit>, userId: string): Promise<Habit>;
   deleteHabit(id: string, userId: string): Promise<Habit>;
@@ -91,6 +93,9 @@ export class HabitService implements IHabitService {
     isActive?: boolean;
     userId: string;
     categoryId?: string;
+    startDate: string;
+    frequency: Frequency
+
   }): Promise<Habit> {
     // Validasi input
     if (!data.title || data.title.trim().length < 3) {
@@ -102,6 +107,8 @@ export class HabitService implements IHabitService {
       description: data.description?.trim() || null,
       isActive: data.isActive ?? true,
       user: { connect: { id: data.userId } },
+      startDate: new Date(data.startDate), 
+      frequency: data.frequency
     };
 
     if (data.categoryId) {

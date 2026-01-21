@@ -1,4 +1,5 @@
 // prisma/seed.ts
+import { Frequency } from '@prisma/client';
 import prismaInstance from '../database.js';
 import { hash } from 'bcrypt';
 const prisma = prismaInstance;
@@ -103,6 +104,8 @@ async function main() {
             id: 'e5f6g7h8-i9j0-1234-efgh-567890123456',
             title: 'Minum Air 8 Gelas',
             description: 'Minum minimal 8 gelas air setiap hari',
+            startDate: new Date('2026-01-01'),
+            frequency: Frequency.DAILY,
             userId: john.id,
             categoryId: healthCategory?.id || null
         }
@@ -112,6 +115,8 @@ async function main() {
             id: 'f6g7h8i9-j0k1-2345-fghi-678901234567',
             title: 'Olahraga Pagi',
             description: 'Lari atau workout 30 menit setiap pagi',
+            startDate: new Date('2026-01-02'),
+            frequency: Frequency.DAILY,
             userId: john.id,
             categoryId: exerciseCategory?.id || null
         }
@@ -121,6 +126,8 @@ async function main() {
             id: 'g7h8i9j0-k1l2-3456-ghij-789012345678',
             title: 'Baca Buku',
             description: 'Baca minimal 10 halaman buku setiap hari',
+            startDate: new Date('2026-01-03'),
+            frequency: Frequency.DAILY,
             userId: john.id,
             categoryId: learnCategory?.id || null
         }
@@ -133,7 +140,9 @@ async function main() {
             title: 'Meditasi',
             description: 'Meditasi 10 menit setiap pagi',
             userId: jane.id,
-            categoryId: healthCategory?.id || null
+            categoryId: healthCategory?.id || null,
+            startDate: new Date('2026-01-04'),
+            frequency: Frequency.DAILY,
         }
     });
     const janeHabit2 = await prisma.habit.create({
@@ -142,7 +151,9 @@ async function main() {
             title: 'Yoga',
             description: 'Yoga 20 menit sebelum tidur',
             userId: jane.id,
-            categoryId: exerciseCategory?.id || null
+            categoryId: exerciseCategory?.id || null,
+            startDate: new Date('2026-01-04'),
+            frequency: Frequency.DAILY,
         }
     });
     const janeHabit3 = await prisma.habit.create({
@@ -151,7 +162,9 @@ async function main() {
             title: 'Catat Pengeluaran',
             description: 'Mencatat semua pengeluaran harian',
             userId: jane.id,
-            categoryId: financeCategory?.id || null
+            categoryId: financeCategory?.id || null,
+            startDate: new Date('2026-01-05'),
+            frequency: Frequency.WEEKLY,
         }
     });
     const janeHabits = [janeHabit1, janeHabit2, janeHabit3];
