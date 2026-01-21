@@ -2,6 +2,8 @@ model Habit {
   id          String    @id @default(uuid())
   title       String
   description String?
+  frequency    Frequency
+  startDate      DateTime
   currentStreak Int     @default(0)
   longestStreak Int     @default(0)
   lastCheckIn   DateTime?
