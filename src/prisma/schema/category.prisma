@@ -1,11 +1,11 @@
 model Category {
-  id          String    @id @default(uuid())
-  name        CategoryName    @unique
+  id          String   @id @default(uuid())
+  name        CategoryName   @unique
+  createdAt   DateTime @default(now())
+  color       String?
   description String?
-  color       String?  
-  icon        String? 
-  createdAt   DateTime  @default(now())
-  habit      Habit[]
-  
+  icon        String?
+  habit       Habit[]
+
   @@map("categories")
 }

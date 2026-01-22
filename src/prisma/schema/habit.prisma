@@ -1,23 +1,22 @@
 model Habit {
-  id          String    @id @default(uuid())
-  title       String
-  description String?
-  frequency    Frequency
-  startDate      DateTime
-  currentStreak Int     @default(0)
-  longestStreak Int     @default(0)
+  id            String    @id @default(uuid())
+  title         String
+  description   String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  startDate     DateTime
+  frequency     Frequency
+  userId        String
+  categoryId    String?
+  currentStreak Int       @default(0)
   lastCheckIn   DateTime?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  userId      String
-  categoryId  String?
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  checkIn    CheckIn[]
-  
+  longestStreak Int       @default(0)
+  checkIn       CheckIn[]
+  category      Category? @relation(fields: [categoryId], references: [id])
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([userId, isActive])
-  
   @@map("habits")
 }

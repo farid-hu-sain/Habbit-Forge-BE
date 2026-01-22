@@ -1,15 +1,15 @@
 model DailyStats {
-  id        String    @id @default(uuid())
-  userId    String
-  date      DateTime  @unique
-  totalHabits   Int     @default(0)
-  completedHabits Int   @default(0)
-  totalCheckIns  Int    @default(0)
-  streak        Int     @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id              String   @id @default(uuid())
+  userId          String
+  date            DateTime @unique
+  totalHabits     Int      @default(0)
+  completedHabits Int      @default(0)
+  totalCheckIns   Int      @default(0)
+  streak          Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, date])
   @@map("daily_stats")
 }

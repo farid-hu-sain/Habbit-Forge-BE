@@ -15,8 +15,8 @@ enum Frequency {
 
 enum CategoryName {
   HEALTHY
-  LEARNING
   FINANCE
   WORK
+  LEARNING
   SOCIAL
 }

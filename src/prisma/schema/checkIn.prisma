@@ -1,13 +1,13 @@
 model CheckIn {
-  id        String    @id @default(uuid())
+  id        String   @id @default(uuid())
   habitId   String
   userId    String
   date      DateTime
   note      String?
-  createdAt DateTime  @default(now())
-  habit     Habit     @relation(fields: [habitId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  createdAt DateTime @default(now())
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([habitId, date])
   @@index([userId, date])
   @@index([habitId])
