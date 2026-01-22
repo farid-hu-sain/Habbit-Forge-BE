@@ -12,3 +12,11 @@ enum Frequency {
   MONTHLY
   YEARLY
 }
+
+enum CategoryName {
+  HEALTHY
+  LEARNING
+  FINANCE
+  WORK
+  SOCIAL
+}

@@ -25,7 +25,7 @@ export class HabitController {
         sortBy,
         sortOrder,
       },
-      userId // ⭐ KIRIM userId
+      userId
     );
 
     const pagination = {

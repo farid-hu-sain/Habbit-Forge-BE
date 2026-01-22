@@ -4,12 +4,9 @@ export class CategoryService {
         this.categoryRepo = categoryRepo;
     }
     async getAll(params) {
-        const { page, limit, search, sortBy, sortOrder } = params;
+        const { page, limit, sortBy, sortOrder } = params;
         const skip = (page - 1) * limit;
         const whereClause = {};
-        if (search?.name) {
-            whereClause.name = { contains: search.name, mode: "insensitive" };
-        }
         const sortCriteria = sortBy ?
             { [sortBy]: sortOrder || "desc" } :
             { createdAt: "desc" };

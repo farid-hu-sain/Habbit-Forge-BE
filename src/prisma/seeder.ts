@@ -1,5 +1,5 @@
 // prisma/seed.ts
-import { Frequency } from '@prisma/client'
+import { Category, Frequency } from '@prisma/client'
 import prismaInstance from '../database.js'
 import { hash } from 'bcrypt'
 
@@ -22,35 +22,35 @@ async function main() {
     data: [
       {
         id: '550e8400-e29b-41d4-a716-446655440001',
-        name: 'Kesehatan',
+        name: 'HEALTHY',
         description: 'Kebiasaan untuk kesehatan fisik & mental',
         color: '#10B981',
         icon: '💊'
       },
       {
         id: '550e8400-e29b-41d4-a716-446655440002',
-        name: 'Olahraga',
+        name: 'HEALTHY',
         description: 'Aktivitas fisik & olahraga',
         color: '#3B82F6',
         icon: '🏃'
       },
       {
         id: '550e8400-e29b-41d4-a716-446655440003',
-        name: 'Belajar',
+        name: 'LEARNING',
         description: 'Kebiasaan belajar & pengembangan diri',
         color: '#8B5CF6',
         icon: '📚'
       },
       {
         id: '550e8400-e29b-41d4-a716-446655440004',
-        name: 'Produktivitas',
+        name: 'LEARNING',
         description: 'Kebiasaan untuk meningkatkan produktivitas',
         color: '#F59E0B',
         icon: '⚡'
       },
       {
         id: '550e8400-e29b-41d4-a716-446655440005',
-        name: 'Finansial',
+        name: 'FINANCE',
         description: 'Kebiasaan pengelolaan keuangan',
         color: '#EF4444',
         icon: '💰'
@@ -60,10 +60,10 @@ async function main() {
 
   // Get category IDs for later use
   const allCategories = await prisma.category.findMany()
-  const healthCategory = allCategories.find(c => c.name === 'Kesehatan')
-  const exerciseCategory = allCategories.find(c => c.name === 'Olahraga')
-  const learnCategory = allCategories.find(c => c.name === 'Belajar')
-  const financeCategory = allCategories.find(c => c.name === 'Finansial')
+  const healthCategory = allCategories.find((c : Category) => c.name === 'HEALTHY')
+  const exerciseCategory = allCategories.find((c : Category) => c.name === 'HEALTHY')
+  const learnCategory = allCategories.find((c : Category) => c.name === 'LEARNING')
+  const financeCategory = allCategories.find((c : Category) => c.name === 'FINANCE')
 
   // 2. Seed Users (with Profiles)
   console.log('👤 Seeding users...')

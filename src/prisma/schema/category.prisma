@@ -1,6 +1,6 @@
 model Category {
   id          String    @id @default(uuid())
-  name        String    @unique
+  name        CategoryName    @unique
   description String?
   color       String?  
   icon        String? 

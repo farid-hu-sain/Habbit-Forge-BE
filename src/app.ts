@@ -14,7 +14,7 @@ import checkInRoutes from './routes/checkIn.route.js';
 import profileRoutes from './routes/profile.route.js';
 import dashboardRoutes from './routes/dashboard.route.js';
 import statRoutes from './routes/stat.route.js';
-import seedRoutes from './routes/seed.route.js';
+
 
 
 const app: Application = express();
@@ -63,7 +63,7 @@ app.use('/api/checkIn', checkInRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/stat', statRoutes);
-app.use("/api/internal", seedRoutes);
+
 
 
 app.use((req: Request, _res: Response, next: NextFunction) => {

@@ -27,14 +27,12 @@ export class CategoryService implements ICategoryService {
   constructor(private categoryRepo: ICategoryRepository) {}
 
   async getAll(params: FindAllParams): Promise<CategoryListResponse> {
-    const { page, limit, search, sortBy, sortOrder } = params;
+    const { page, limit, sortBy, sortOrder } = params;
     const skip = (page - 1) * limit;
     
     const whereClause: Prisma.CategoryWhereInput = {};
 
-    if (search?.name) {
-      whereClause.name = { contains: search.name, mode: "insensitive" };
-    }
+  
 
     const sortCriteria: Prisma.CategoryOrderByWithRelationInput = sortBy ? 
       { [sortBy]: sortOrder || "desc" } : 

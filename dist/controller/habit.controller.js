@@ -21,8 +21,7 @@ export class HabitController {
             search,
             sortBy,
             sortOrder,
-        }, userId // ⭐ KIRIM userId
-        );
+        }, userId);
         const pagination = {
             page: result.currentPage,
             limit,
