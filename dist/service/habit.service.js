@@ -46,6 +46,7 @@ export class HabitService {
             isActive: data.isActive ?? true,
             user: { connect: { id: data.userId } },
             startDate: new Date(data.startDate),
+            lastCheckIn: new Date(data.lastCheckIn),
             frequency: data.frequency
         };
         if (data.categoryId) {

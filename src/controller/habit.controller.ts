@@ -58,7 +58,7 @@ export class HabitController {
     const userId = req.user?.id;
     if (!userId) throw new Error("Unauthorized");
 
-    const { title, description, isActive, categoryId, startDate, frequency } = req.body;
+    const { title, description, isActive, categoryId, startDate, frequency, lastCheckIn } = req.body;
     
     if (!title) throw new Error("Title diperlukan");
     if (!startDate) throw new Error("startDate diperlukan");
@@ -80,6 +80,7 @@ export class HabitController {
       userId,
       categoryId,
       startDate,
+      lastCheckIn,
       frequency
     });
 

@@ -27,7 +27,8 @@ export interface IHabitService {
     isActive?: boolean;
     userId: string;
     categoryId?: string;
-    startDate: string
+    startDate: string;
+    lastCheckIn: string
     frequency: Frequency
   }): Promise<Habit>;
   updateHabit(id: string, data: Partial<Habit>, userId: string): Promise<Habit>;
@@ -95,6 +96,7 @@ export class HabitService implements IHabitService {
     categoryId?: string;
     startDate: string;
     frequency: Frequency
+    lastCheckIn: string
 
   }): Promise<Habit> {
     // Validasi input
@@ -107,7 +109,8 @@ export class HabitService implements IHabitService {
       description: data.description?.trim() || null,
       isActive: data.isActive ?? true,
       user: { connect: { id: data.userId } },
-      startDate: new Date(data.startDate), 
+      startDate: new Date(data.startDate),
+      lastCheckIn: new Date(data.lastCheckIn), 
       frequency: data.frequency
     };
 
