@@ -4,7 +4,10 @@ import { HabitRepository } from "../repository/habit.repository.js";
 import { HabitService } from "../service/habit.service.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { validate } from "../utils/validation.js";
-import { createHabitValidation, updateHabitValidation } from "../middleware/habit.validation.js";
+import {
+  createHabitValidation,
+  updateHabitValidation,
+} from "../middleware/habit.validation.js";
 import prismaInstance from "../database.js";
 
 const repo = new HabitRepository(prismaInstance);
@@ -50,6 +53,98 @@ router.get("/", authenticate, controller.getAllHabitHandler);
 
 /**
  * @swagger
+ * /habit/today-status:
+ *   get:
+ *     summary: Get habits with today's check-in status
+ *     description: Get all active habits with today's check-in completion status
+ *     tags: [Habits]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Habits with today's check-in status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Habits dengan status check-in hari ini berhasil diambil"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       title:
+ *                         type: string
+ *                         example: "Minum Air 8 Gelas"
+ *                       description:
+ *                         type: string
+ *                         example: "Minimal 8 gelas air setiap hari"
+ *                       frequency:
+ *                         type: string
+ *                         enum: [DAILY, WEEKLY, MONTHLY, YEARLY]
+ *                         example: "DAILY"
+ *                       isActive:
+ *                         type: boolean
+ *                         example: true
+ *                       category:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                             format: uuid
+ *                           name:
+ *                             type: string
+ *                             example: "HEALTHY"
+ *                       startDate:
+ *                         type: string
+ *                         format: date-time
+ *                       currentStreak:
+ *                         type: integer
+ *                         example: 14
+ *                       longestStreak:
+ *                         type: integer
+ *                         example: 30
+ *                       isCheckedToday:
+ *                         type: boolean
+ *                         description: "Whether habit has been checked in today"
+ *                         example: true
+ *                       todayCheckIn:
+ *                         type: object
+ *                         nullable: true
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                             format: uuid
+ *                           date:
+ *                             type: string
+ *                             format: date-time
+ *                           note:
+ *                             type: string
+ *                             example: "Sudah minum 8 gelas"
+ *                       canCheckInToday:
+ *                         type: boolean
+ *                         description: "Whether user can check in today"
+ *                         example: false
+ *       401:
+ *         description: Unauthorized
+ */
+router.get(
+  "/today-status",
+  authenticate,
+  controller.getHabitsWithTodayStatusHandler,
+);
+
+/**
+ * @swagger
  * /habit:
  *   post:
  *     summary: Create new habit
@@ -64,39 +159,50 @@ router.get("/", authenticate, controller.getAllHabitHandler);
  *             type: object
  *             required:
  *               - title
+ *               - startDate
+ *               - frequency
  *             properties:
  *               title:
  *                 type: string
  *                 minLength: 3
  *                 maxLength: 100
+ *                 example: "Minum Air 8 Gelas"
  *               description:
  *                 type: string
  *                 maxLength: 500
+ *                 example: "Minimal 8 gelas air setiap hari"
  *               isActive:
  *                 type: boolean
  *                 default: true
  *               categoryId:
  *                 type: string
  *                 format: uuid
- *               startDate: 
- *                 type : string
- *                 format: date-time
- *                 example: "2026-01-01T00:00:00Z"
- *               frequency: 
- *                  type: string
- *                  enum : 
+ *                 example: "550e8400-e29b-41d4-a716-446655440001"
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *                 description: "Start date in YYYY-MM-DD format"
+ *                 example: "2024-01-15"
+ *               frequency:
+ *                 type: string
+ *                 enum:
  *                   - DAILY
  *                   - WEEKLY
  *                   - MONTHLY
  *                   - YEARLY
- *               
+ *                 example: "DAILY"
  *     responses:
  *       201:
  *         description: Habit created successfully
  *       400:
  *         description: Validation error
  */
-router.post("/", authenticate, validate(createHabitValidation), controller.createHabitHandler);
+router.post(
+  "/",
+  authenticate,
+  validate(createHabitValidation),
+  controller.createHabitHandler,
+);
 
 /**
  * @swagger
@@ -154,13 +260,13 @@ router.get("/:id", authenticate, controller.getHabitByIdHandler);
  *               categoryId:
  *                 type: string
  *                 format: uuid
- *               startDate: 
- *                 type : string
+ *               startDate:
+ *                 type: string
  *                 format: date-time
- *                 example: "2026-01-01T00:00:00Z"
- *               frequency: 
- *                  type: string
- *                  enum : 
+ *                 example: "2024-01-15T00:00:00Z"
+ *               frequency:
+ *                 type: string
+ *                 enum:
  *                   - DAILY
  *                   - WEEKLY
  *                   - MONTHLY
@@ -171,7 +277,12 @@ router.get("/:id", authenticate, controller.getHabitByIdHandler);
  *       404:
  *         description: Habit not found
  */
-router.put("/:id", authenticate, validate(updateHabitValidation), controller.updateHabitHandler);
+router.put(
+  "/:id",
+  authenticate,
+  validate(updateHabitValidation),
+  controller.updateHabitHandler,
+);
 
 /**
  * @swagger

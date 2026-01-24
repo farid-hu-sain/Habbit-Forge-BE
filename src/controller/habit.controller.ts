@@ -65,9 +65,9 @@ export class HabitController {
     if (!startDate) throw new Error("startDate diperlukan");
     if (!frequency) throw new Error("frequency diperlukan");
 
-    const normalizedStartDate = new Date(`${startDate}T00:00:00Z`);
+    const normalizedStartDate = new Date(`${startDate}T00:00:00`);
     if (isNaN(normalizedStartDate.getTime())) {
-      throw new Error("Format startDate tidak valid (YYYY-MM-DD)");
+      throw new Error("Format startDate tidak valid");
     }
 
     if (!Object.values(Frequency).includes(frequency)) {
@@ -128,4 +128,21 @@ export class HabitController {
 
     successResponse(res, message, toggledHabit);
   });
+
+  // ✅ NEW: Get habits with today's check-in status
+  getHabitsWithTodayStatusHandler = asyncHandler(
+    async (req: Request, res: Response) => {
+      const userId = req.user?.id;
+      if (!userId) throw new Error("Unauthorized");
+
+      const habitsWithStatus =
+        await this.habitService.getHabitsWithTodayStatus(userId);
+
+      successResponse(
+        res,
+        "Habits dengan status check-in hari ini berhasil diambil",
+        habitsWithStatus,
+      );
+    },
+  );
 }
