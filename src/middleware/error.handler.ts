@@ -5,7 +5,7 @@ export const errorHandler = (
   err: Error,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ) => {
   console.error("ERROR:", err.message);
 
@@ -17,6 +17,6 @@ export const errorHandler = (
     statusCode,
     process.env.NODE_ENV === "development"
       ? ({ stack: err.stack } as { stack?: string })
-      : null
+      : null,
   );
 };

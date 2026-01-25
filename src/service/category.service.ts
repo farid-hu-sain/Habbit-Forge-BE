@@ -23,38 +23,41 @@ export interface ICategoryService {
   getCategoryById(id: string): Promise<Category>;
 }
 
-export class CategoryService implements ICategoryService { 
+export class CategoryService implements ICategoryService {
   constructor(private categoryRepo: ICategoryRepository) {}
 
   async getAll(params: FindAllParams): Promise<CategoryListResponse> {
     const { page, limit, sortBy, sortOrder } = params;
     const skip = (page - 1) * limit;
-    
+
     const whereClause: Prisma.CategoryWhereInput = {};
 
-  
+    const sortCriteria: Prisma.CategoryOrderByWithRelationInput = sortBy
+      ? { [sortBy]: sortOrder || "desc" }
+      : { createdAt: "desc" };
 
-    const sortCriteria: Prisma.CategoryOrderByWithRelationInput = sortBy ? 
-      { [sortBy]: sortOrder || "desc" } : 
-      { createdAt: "desc" };
+    const category = await this.categoryRepo.list(
+      skip,
+      limit,
+      whereClause,
+      sortCriteria,
+    );
 
-    const category = await this.categoryRepo.list(skip, limit, whereClause, sortCriteria);
-    
     const total = await this.categoryRepo.countAll(whereClause);
 
-    return { 
+    return {
       category,
-      total, 
-      totalPages: Math.ceil(total / limit), 
-      currentPage: page 
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
     };
   }
 
   async getCategoryById(id: string): Promise<Category> {
     const category = await this.categoryRepo.findById(id);
-    
+
     if (!category) {
-      throw new Error('Category tidak ditemukan');
+      throw new Error("Category tidak ditemukan");
     }
 
     return category;

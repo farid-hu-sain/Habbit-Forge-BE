@@ -10,7 +10,11 @@ export interface ICheckInService {
     habitId: string;
     userId: string;
   }): Promise<CheckIn>;
-  updateCheckIn(id: string, data: Partial<CheckIn>, userId: string): Promise<CheckIn>;
+  updateCheckIn(
+    id: string,
+    data: Partial<CheckIn>,
+    userId: string,
+  ): Promise<CheckIn>;
   deleteCheckIn(id: string, userId: string): Promise<CheckIn>;
 }
 
@@ -19,7 +23,7 @@ export class CheckInService implements ICheckInService {
 
   async getCheckInById(id: string, userId: string): Promise<CheckIn> {
     const checkIn = await this.checkInRepo.findById(id);
-    
+
     if (!checkIn) {
       throw new Error("CheckIn tidak ditemukan");
     }
@@ -44,8 +48,8 @@ export class CheckInService implements ICheckInService {
       where: {
         id: data.habitId,
         userId: data.userId,
-        isActive: true
-      }
+        isActive: true,
+      },
     });
 
     if (!habit) {
@@ -59,11 +63,11 @@ export class CheckInService implements ICheckInService {
         userId: data.userId,
         date: {
           gte: start,
-          lte: end
-        }
-      }
+          lte: end,
+        },
+      },
     });
-    
+
     if (existingCheckIn) {
       throw new Error("Sudah check-in hari ini");
     }
@@ -79,7 +83,11 @@ export class CheckInService implements ICheckInService {
     return await this.checkInRepo.create(input);
   }
 
-  async updateCheckIn(id: string, data: Partial<CheckIn>, userId: string): Promise<CheckIn> {
+  async updateCheckIn(
+    id: string,
+    data: Partial<CheckIn>,
+    userId: string,
+  ): Promise<CheckIn> {
     // Validasi ownership
     await this.getCheckInById(id, userId);
 
@@ -89,7 +97,7 @@ export class CheckInService implements ICheckInService {
   async deleteCheckIn(id: string, userId: string): Promise<CheckIn> {
     // Validasi ownership
     await this.getCheckInById(id, userId);
-    
+
     return await this.checkInRepo.softDelete(id);
   }
 }

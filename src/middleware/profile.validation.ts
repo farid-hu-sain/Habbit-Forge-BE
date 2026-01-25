@@ -6,7 +6,7 @@ export const updateProfileValidation = [
     .trim()
     .isLength({ max: 100 })
     .withMessage("Nama lengkap maksimal 100 karakter"),
-    
+
   body("bio")
     .optional()
     .trim()

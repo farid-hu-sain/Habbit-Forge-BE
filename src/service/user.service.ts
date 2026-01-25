@@ -1,7 +1,7 @@
 import prisma from "../database.js";
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import config from '../utils/env.js';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import config from "../utils/env.js";
 
 export interface RegisterData {
   username: string;
@@ -27,17 +27,19 @@ export interface UserProfile {
 }
 
 export class UserService {
-  async register(data: RegisterData): Promise<{ user: UserProfile; token: string }> {
-    const existingUser = await prisma.user.findUnique({ 
-      where: { email: data.email } 
+  async register(
+    data: RegisterData,
+  ): Promise<{ user: UserProfile; token: string }> {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email },
     });
-    
+
     if (existingUser) throw new Error("Email sudah terdaftar");
 
     const existingUsername = await prisma.user.findUnique({
-      where: { username: data.username }
+      where: { username: data.username },
     });
-    
+
     if (existingUsername) throw new Error("Username sudah terdaftar");
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -47,25 +49,25 @@ export class UserService {
         email: data.email,
         username: data.username,
         password: hashedPassword,
-        profile: { create: { fullName: data.username } }
+        profile: { create: { fullName: data.username } },
       },
-      include: { profile: true }
+      include: { profile: true },
     });
 
     const token = this.generateToken(user.id, user.email, user.username);
 
     return {
       user: this.formatUserResponse(user),
-      token
+      token,
     };
   }
 
   async login(data: LoginData): Promise<{ user: UserProfile; token: string }> {
     const user = await prisma.user.findUnique({
       where: { email: data.email },
-      include: { profile: true }
+      include: { profile: true },
     });
-    
+
     if (!user) throw new Error("Email atau password salah");
 
     const isValid = await bcrypt.compare(data.password, user.password);
@@ -75,7 +77,7 @@ export class UserService {
 
     return {
       user: this.formatUserResponse(user),
-      token
+      token,
     };
   }
 
@@ -88,25 +90,29 @@ export class UserService {
         username: true,
         createdAt: true,
         updatedAt: true,
-        profile: true
-      }
+        profile: true,
+      },
     });
-    
+
     if (!user) throw new Error("User tidak ditemukan");
-    
+
     return this.formatUserResponse(user);
   }
 
-  private generateToken(userId: string, email: string, username: string): string {
+  private generateToken(
+    userId: string,
+    email: string,
+    username: string,
+  ): string {
     return jwt.sign(
-      { 
+      {
         id: userId,
         email: email,
         username: username,
-        role: 'user'
+        role: "user",
       },
       config.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: "7d" },
     );
   }
 
@@ -116,7 +122,7 @@ export class UserService {
       email: user.email,
       username: user.username,
       profile: user.profile,
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
     };
   }
 }

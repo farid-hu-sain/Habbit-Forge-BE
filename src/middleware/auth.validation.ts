@@ -7,7 +7,7 @@ export const registerValidation = [
     .isEmail()
     .withMessage("Format email tidak valid")
     .normalizeEmail(),
-    
+
   body("username")
     .notEmpty()
     .withMessage("Username diperlukan")
@@ -16,7 +16,7 @@ export const registerValidation = [
     .withMessage("Username harus 3-30 karakter")
     .matches(/^[a-zA-Z0-9_]+$/)
     .withMessage("Username hanya boleh huruf, angka, dan underscore"),
-    
+
   body("password")
     .notEmpty()
     .withMessage("Password diperlukan")
@@ -31,8 +31,6 @@ export const loginValidation = [
     .isEmail()
     .withMessage("Format email tidak valid")
     .normalizeEmail(),
-    
-  body("password")
-    .notEmpty()
-    .withMessage("Password diperlukan"),
+
+  body("password").notEmpty().withMessage("Password diperlukan"),
 ];

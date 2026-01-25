@@ -3,11 +3,14 @@ import type { IProfileRepository } from "../repository/profile.repository.js";
 
 export interface IProfileService {
   getProfileByUserId(userId: string): Promise<Profile>;
-  updateProfile(userId: string, data: {
-    fullName?: string;
-    bio?: string;
-    avatar?: string;
-  }): Promise<Profile>;
+  updateProfile(
+    userId: string,
+    data: {
+      fullName?: string;
+      bio?: string;
+      avatar?: string;
+    },
+  ): Promise<Profile>;
 }
 
 export class ProfileService implements IProfileService {
@@ -29,7 +32,7 @@ export class ProfileService implements IProfileService {
       fullName?: string;
       bio?: string;
       avatar?: string;
-    }
+    },
   ): Promise<Profile> {
     return await this.profileRepo.updateByUserId(userId, data);
   }

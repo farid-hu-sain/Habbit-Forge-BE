@@ -6,7 +6,7 @@ export interface ICheckInRepository {
     skip: number,
     take: number,
     where: Prisma.CheckInWhereInput,
-    orderBy: Prisma.CheckInOrderByWithRelationInput
+    orderBy: Prisma.CheckInOrderByWithRelationInput,
   ): Promise<CheckIn[]>;
   findById(id: string): Promise<CheckIn | null>;
   create(data: Prisma.CheckInCreateInput): Promise<CheckIn>;
@@ -22,7 +22,7 @@ export class CheckInRepository implements ICheckInRepository {
     skip: number,
     take: number,
     where: Prisma.CheckInWhereInput,
-    orderBy: Prisma.CheckInOrderByWithRelationInput
+    orderBy: Prisma.CheckInOrderByWithRelationInput,
   ): Promise<CheckIn[]> {
     return await this.prisma.checkIn.findMany({
       skip,
@@ -52,7 +52,7 @@ export class CheckInRepository implements ICheckInRepository {
     const startOfDay = getStartOfDate(date);
     const endOfDay = new Date(startOfDay);
     endOfDay.setHours(23, 59, 59, 999);
-    
+
     return await this.prisma.checkIn.findFirst({
       where: {
         habitId,

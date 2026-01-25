@@ -89,11 +89,6 @@ export class DashboardRepository {
     };
   }
 
-  // ========== OPTIMIZED METHODS ==========
-
-  /**
-   * Hitung streak dengan 1 query (OPTIMIZED)
-   */
   private async calculateStreakOptimized(userId: string): Promise<number> {
     // Ambil 60 hari terakhir sekaligus
     const sixtyDaysAgo = new Date();

@@ -6,7 +6,7 @@ export const createCheckInValidation = [
     .withMessage("Habit ID diperlukan")
     .isUUID()
     .withMessage("Habit ID harus format UUID"),
-  
+
   body("note")
     .optional()
     .trim()
@@ -15,10 +15,8 @@ export const createCheckInValidation = [
 ];
 
 export const updateCheckInValidation = [
-  param("id")
-    .isUUID()
-    .withMessage("CheckIn ID harus format UUID"),
-    
+  param("id").isUUID().withMessage("CheckIn ID harus format UUID"),
+
   body("note")
     .optional()
     .trim()

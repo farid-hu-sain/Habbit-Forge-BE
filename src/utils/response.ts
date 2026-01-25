@@ -22,8 +22,13 @@ export const successResponse = (
   res: Response,
   message: string,
   data: unknown = null,
-  pagination: { page: number; limit: number; total: number, totalPages: number } | null = null,
-  statusCode: number = 200
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  } | null = null,
+  statusCode: number = 200,
 ) => {
   const response: ApiResponse = {
     success: true,
@@ -45,7 +50,7 @@ export const errorResponse = (
   errors:
     | Array<{ field: string; message: string }>
     | { stack?: string }
-    | null = null
+    | null = null,
 ) => {
   const response: ApiResponse = {
     success: false,

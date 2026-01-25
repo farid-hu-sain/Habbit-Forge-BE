@@ -65,7 +65,7 @@ router.put(
   authenticate,
   upload.single("avatar"),
   validate(updateProfileValidation),
-  controller.updateProfileHandler
+  controller.updateProfileHandler,
 );
 
 export default router;
