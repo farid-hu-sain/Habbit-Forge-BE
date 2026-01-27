@@ -53,17 +53,17 @@ router.get("/", authenticate, controller.getProfileByIdHandler);
  *               avatar:
  *                 type: string
  *                 format: binary
- *                 description: Profile picture (max 2MB)
+ *                 description: Profile picture (max 2MB, JPEG/PNG/GIF/WebP)
  *     responses:
  *       200:
  *         description: Profile updated successfully
  *       400:
- *         description: Validation error
+ *         description: Validation error or file too large
  */
 router.put(
   "/",
   authenticate,
-  upload.single("avatar"),
+  upload.single("avatar"), // Single file upload for avatar
   validate(updateProfileValidation),
   controller.updateProfileHandler,
 );

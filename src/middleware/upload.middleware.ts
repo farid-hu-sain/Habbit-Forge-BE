@@ -1,14 +1,31 @@
 import multer from "multer";
 import path from "path";
+import crypto from "crypto";
 import type { Request } from "express";
+
+// Allowed image MIME types
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+];
+
+// Max file size: 2MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, "public/uploads/");
   },
   filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    // Generate secure random filename
+    const randomName = crypto.randomBytes(16).toString("hex");
+    const extension = path.extname(file.originalname).toLowerCase();
+    const safeFileName = randomName + extension;
+
+    cb(null, safeFileName);
   },
 });
 
@@ -17,15 +34,23 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback,
 ) => {
-  if (file.mimetype.startsWith("image/")) {
+  // Check MIME type
+  if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(null, false);
+    cb(
+      new Error(
+        "Hanya file gambar (JPEG, PNG, GIF, WebP) yang diperbolehkan",
+      ) as any,
+    );
   }
 };
 
 export const upload = multer({
   storage: storage,
-  limits: { fileSize: 2 * 1024 * 1024 },
+  limits: {
+    fileSize: MAX_FILE_SIZE,
+    files: 1, // Max 1 file per request
+  },
   fileFilter: fileFilter,
 });
