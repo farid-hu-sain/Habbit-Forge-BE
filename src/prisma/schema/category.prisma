@@ -1,19 +1,17 @@
 model Category {
   id          String   @id @default(uuid())
-  name        CategoryName   @unique
-  createdAt   DateTime @default(now())
-  color       String?
+  name        String   // Bukan enum lagi, bisa custom
   description String?
+  color       String?
   icon        String?
+  isSystem    Boolean  @default(false) // true = system category, false = user category
+  userId      String?  // null untuk system category, user ID untuk custom
+  createdAt   DateTime @default(now())
+  
   habit       Habit[]
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // Unique constraint: name harus unique per user (system category: userId = null)
+  @@unique([name, userId])
   @@map("categories")
-}
-
-enum CategoryName {
-  HEALTHY
-  FINANCE
-  WORK
-  LEARNING
-  SOCIAL
 }

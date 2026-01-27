@@ -1,7 +1,7 @@
-import { Category, Frequency } from "@prisma/client";
+import { Frequency } from "@prisma/client";
 import prismaInstance from "../database.js";
 import { hash } from "bcrypt";
-import { formatDateForFE, parseDateFromFE } from "../utils/timeUtils.js";
+import {  parseDateFromFE } from "../utils/timeUtils.js";
 
 const prisma = prismaInstance;
 
@@ -16,68 +16,60 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.category.deleteMany();
 
-  // 1. Seed Categories
-  console.log("📂 Seeding categories...");
+  // 1. Seed SYSTEM Categories (5 template default)
+  console.log("📂 Seeding system categories...");
 
-  const categoriesData = [
+  const systemCategories = [
     {
-      id: "550e8400-e29b-41d4-a716-446655440001",
-      name: "HEALTHY" as const,
+      id: "cat-healthy",
+      name: "Kesehatan",
       description: "Kebiasaan untuk kesehatan fisik & mental",
       color: "#10B981",
       icon: "💊",
+      isSystem: true,
     },
     {
-      id: "550e8400-e29b-41d4-a716-446655440002",
-      name: "FINANCE" as const,
+      id: "cat-finance",
+      name: "Keuangan",
       description: "Kebiasaan pengelolaan keuangan",
       color: "#EF4444",
       icon: "💰",
+      isSystem: true,
     },
     {
-      id: "550e8400-e29b-41d4-a716-446655440003",
-      name: "WORK" as const,
+      id: "cat-work",
+      name: "Pekerjaan",
       description: "Kebiasaan produktivitas & pekerjaan",
       color: "#F59E0B",
       icon: "💼",
+      isSystem: true,
     },
     {
-      id: "550e8400-e29b-41d4-a716-446655440004",
-      name: "LEARNING" as const,
+      id: "cat-learning",
+      name: "Belajar",
       description: "Kebiasaan belajar & pengembangan diri",
       color: "#8B5CF6",
       icon: "📚",
+      isSystem: true,
     },
     {
-      id: "550e8400-e29b-41d4-a716-446655440005",
-      name: "SOCIAL" as const,
+      id: "cat-social",
+      name: "Sosial",
       description: "Kebiasaan hubungan sosial & keluarga",
       color: "#3B82F6",
       icon: "👥",
+      isSystem: true,
     },
   ];
 
-  await prisma.category.createMany({
-    data: categoriesData,
-  });
+  // Create system categories (userId akan null karena system category)
+  for (const category of systemCategories) {
+    await prisma.category.create({
+      data: category,
+    });
+  }
 
-  // Get category IDs for later use
-  const allCategories = await prisma.category.findMany();
-
-  const findCategory = (name: string): Category => {
-    const category = allCategories.find((c) => c.name === name);
-    if (!category) {
-      throw new Error(`Category ${name} not found after seeding`);
-    }
-    return category;
-  };
-
-  const healthCategory = findCategory("HEALTHY");
-  const financeCategory = findCategory("FINANCE");
-  const workCategory = findCategory("WORK");
-  const learningCategory = findCategory("LEARNING");
-
-  // 2. Seed Users (with Profiles)
+  // 2. Seed Users
   console.log("👤 Seeding users...");
 
   const password = await hash("password123", 10);
@@ -85,13 +77,12 @@ async function main() {
   // User 1: John Doe
   const john = await prisma.user.create({
     data: {
-      id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      id: "user-john",
       email: "john@example.com",
       username: "johndoe",
       password: password,
       profile: {
         create: {
-          id: "b2c3d4e5-f6g7-8901-bcde-f23456789012",
           fullName: "John Doe",
           bio: "Suka olahraga dan belajar hal baru",
           avatar: "https://i.pravatar.cc/150?img=1",
@@ -103,13 +94,12 @@ async function main() {
   // User 2: Jane Smith
   const jane = await prisma.user.create({
     data: {
-      id: "c3d4e5f6-g7h8-9012-cdef-345678901234",
+      id: "user-jane",
       email: "jane@example.com",
       username: "janesmith",
       password: password,
       profile: {
         create: {
-          id: "d4e5f6g7-h8i9-0123-defg-456789012345",
           fullName: "Jane Smith",
           bio: "Fokus pada kesehatan dan produktivitas",
           avatar: "https://i.pravatar.cc/150?img=2",
@@ -118,278 +108,139 @@ async function main() {
     },
   });
 
-  // 3. Seed Habits - TANPA currentStreak & longestStreak
+  // 3. Get system categories untuk referensi
+  const allCategories = await prisma.category.findMany();
+
+  const getCategory = (name: string) => {
+    return allCategories.find((c) => c.name === name && c.isSystem);
+  };
+
+  const kesehatanCategory = getCategory("Kesehatan")!;
+  const belajarCategory = getCategory("Belajar")!;
+  const keuanganCategory = getCategory("Keuangan")!;
+
+  // 4. Seed Habits
   console.log("🎯 Seeding habits...");
 
-  // Helper untuk parse date string ke Date
+  // Helper untuk parse date
   const parseSeedDate = (dateString: string): Date => {
     return parseDateFromFE(dateString);
   };
 
-  // John's habits
-  const johnHabit1 = await prisma.habit.create({
-    data: {
-      id: "e5f6g7h8-i9j0-1234-efgh-567890123456",
+  // Simple habits data
+  const habitsData = [
+    // John's habits
+    {
+      id: "habit-john-001",
       title: "Minum Air 8 Gelas",
       description: "Minum minimal 8 gelas air setiap hari",
-      startDate: parseSeedDate("2024-01-01"),
+      startDate: "2024-01-01",
       frequency: Frequency.DAILY,
       userId: john.id,
-      categoryId: healthCategory.id,
-      // ❌ TIDAK ADA currentStreak & longestStreak
+      categoryId: kesehatanCategory.id,
     },
-  });
-
-  const johnHabit2 = await prisma.habit.create({
-    data: {
-      id: "f6g7h8i9-j0k1-2345-fghi-678901234567",
-      title: "Olahraga Pagi",
-      description: "Lari atau workout 30 menit setiap pagi",
-      startDate: parseSeedDate("2024-01-02"),
-      frequency: Frequency.DAILY,
-      userId: john.id,
-      categoryId: healthCategory.id,
-      // ❌ TIDAK ADA currentStreak & longestStreak
-    },
-  });
-
-  const johnHabit3 = await prisma.habit.create({
-    data: {
-      id: "g7h8i9j0-k1l2-3456-ghij-789012345678",
+    {
+      id: "habit-john-002",
       title: "Baca Buku",
       description: "Baca minimal 10 halaman buku setiap hari",
-      startDate: parseSeedDate("2024-01-03"),
+      startDate: "2024-01-03",
       frequency: Frequency.DAILY,
       userId: john.id,
-      categoryId: learningCategory.id,
-      // ❌ TIDAK ADA currentStreak & longestStreak
+      categoryId: belajarCategory.id,
     },
-  });
-
-  // Jane's habits
-  const janeHabit1 = await prisma.habit.create({
-    data: {
-      id: "h8i9j0k1-l2m3-4567-hijk-890123456789",
-      title: "Meditasi",
+    // Jane's habits
+    {
+      id: "habit-jane-001",
+      title: "Meditasi Pagi",
       description: "Meditasi 10 menit setiap pagi",
-      userId: jane.id,
-      categoryId: healthCategory.id,
-      startDate: parseSeedDate("2024-01-04"),
+      startDate: "2024-01-04",
       frequency: Frequency.DAILY,
-      // ❌ TIDAK ADA currentStreak & longestStreak
-    },
-  });
-
-  const janeHabit2 = await prisma.habit.create({
-    data: {
-      id: "i9j0k1l2-m3n4-5678-ijkl-901234567890",
-      title: "Yoga",
-      description: "Yoga 20 menit sebelum tidur",
       userId: jane.id,
-      categoryId: healthCategory.id,
-      startDate: parseSeedDate("2024-01-04"),
-      frequency: Frequency.DAILY,
-      // ❌ TIDAK ADA currentStreak & longestStreak
+      categoryId: kesehatanCategory.id,
     },
-  });
-
-  const janeHabit3 = await prisma.habit.create({
-    data: {
-      id: "j0k1l2m3-n4o5-6789-jklm-012345678901",
+    {
+      id: "habit-jane-002",
       title: "Catat Pengeluaran",
       description: "Mencatat semua pengeluaran harian",
-      userId: jane.id,
-      categoryId: financeCategory.id,
-      startDate: parseSeedDate("2024-01-05"),
+      startDate: "2024-01-05",
       frequency: Frequency.WEEKLY,
-      // ❌ TIDAK ADA currentStreak & longestStreak
-    },
-  });
-
-  const janeHabit4 = await prisma.habit.create({
-    data: {
-      id: "k1l2m3n4-o5p6-7890-klmn-123456789012",
-      title: "Review Weekly Goals",
-      description: "Review goals kerja mingguan",
       userId: jane.id,
-      categoryId: workCategory.id,
-      startDate: parseSeedDate("2024-01-06"),
-      frequency: Frequency.WEEKLY,
-      // ❌ TIDAK ADA currentStreak & longestStreak
+      categoryId: keuanganCategory.id,
     },
-  });
+  ];
 
-  const johnHabits = [johnHabit1, johnHabit2, johnHabit3];
-  const janeHabits = [janeHabit1, janeHabit2, janeHabit3, janeHabit4];
+  for (const habit of habitsData) {
+    await prisma.habit.create({
+      data: {
+        ...habit,
+        startDate: parseSeedDate(habit.startDate),
+      },
+    });
+  }
 
-  // 4. Seed Check-ins (Last 7 days)
+  // 5. Seed Simple Check-ins
   console.log("✅ Seeding check-ins...");
 
-  // Helper untuk buat date string dan object
-  function getDateString(daysAgo: number): string {
+  // Helper untuk date
+  function getTodayDate(): Date {
     const today = new Date();
-    const date = new Date(today);
-    date.setDate(date.getDate() - daysAgo);
-    return formatDateForFE(date);
+    today.setHours(0, 0, 0, 0);
+    return today;
   }
 
-  function getDateObject(daysAgo: number): Date {
-    const dateString = getDateString(daysAgo);
-    return parseDateFromFE(dateString);
+  function getYesterdayDate(): Date {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    return yesterday;
   }
 
-  const checkInPromises = [];
-
-  // John's check-ins (lebih konsisten)
-  for (let i = 0; i < 7; i++) {
-    const date = getDateObject(i);
-
-    // Habit 1: Minum Air (check-in setiap hari)
-    checkInPromises.push(
-      prisma.checkIn.create({
-        data: {
-          habitId: johnHabit1.id,
-          userId: john.id,
-          date: date,
-          note: i === 0 ? "Sudah minum 8 gelas hari ini" : null,
-        },
-      }),
-    );
-
-    // Habit 2: Olahraga (skip weekend - Sabtu & Minggu)
-    const dayOfWeek = date.getDay(); // 0 = Minggu, 6 = Sabtu
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      checkInPromises.push(
-        prisma.checkIn.create({
-          data: {
-            habitId: johnHabit2.id,
-            userId: john.id,
-            date: date,
-            note: i === 0 ? "Lari 3km pagi ini" : null,
-          },
-        }),
-      );
-    }
-
-    // Habit 3: Baca Buku (check-in 5 dari 7 hari)
-    if (i < 5) {
-      checkInPromises.push(
-        prisma.checkIn.create({
-          data: {
-            habitId: johnHabit3.id,
-            userId: john.id,
-            date: date,
-            note: i === 0 ? "Baca chapter 5" : null,
-          },
-        }),
-      );
-    }
-  }
-
-  // Jane's check-ins (sedikit lebih random)
-  for (let i = 0; i < 5; i++) {
-    const date = getDateObject(i);
-
-    // Habit 1: Meditasi (4 dari 5 hari)
-    if (i !== 2) {
-      checkInPromises.push(
-        prisma.checkIn.create({
-          data: {
-            habitId: janeHabit1.id,
-            userId: jane.id,
-            date: date,
-            note: i === 0 ? "Meditasi pagi hari" : null,
-          },
-        }),
-      );
-    }
-
-    // Habit 2: Yoga (3 dari 5 hari)
-    if (i === 0 || i === 2 || i === 4) {
-      checkInPromises.push(
-        prisma.checkIn.create({
-          data: {
-            habitId: janeHabit2.id,
-            userId: jane.id,
-            date: date,
-            note: i === 0 ? "Yoga sebelum tidur" : null,
-          },
-        }),
-      );
-    }
-
-    // Habit 4: Review Goals (1x per minggu)
-    if (i === 0) {
-      checkInPromises.push(
-        prisma.checkIn.create({
-          data: {
-            habitId: janeHabit4.id,
-            userId: jane.id,
-            date: date,
-            note: "Coffee chat dengan senior developer",
-          },
-        }),
-      );
-    }
-  }
-
-  await Promise.all(checkInPromises);
-
-  // 5. Seed Daily Stats (optional, untuk testing dashboard)
-  console.log("📊 Seeding daily stats...");
-  
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  
-  // John's daily stats
-  await prisma.dailyStats.create({
-    data: {
-      userId: john.id,
-      date: parseDateFromFE(formatDateForFE(today)),
-      totalHabits: 3,
-      completedHabits: 2,
-      totalCheckIns: 15,
-      streak: 5,
-    },
-  });
-  
-  await prisma.dailyStats.create({
-    data: {
-      userId: john.id,
-      date: parseDateFromFE(formatDateForFE(yesterday)),
-      totalHabits: 3,
-      completedHabits: 3,
-      totalCheckIns: 12,
-      streak: 4,
-    },
-  });
-  
-  // Jane's daily stats
-  await prisma.dailyStats.create({
-    data: {
-      userId: jane.id,
-      date: parseDateFromFE(formatDateForFE(today)),
-      totalHabits: 4,
-      completedHabits: 3,
-      totalCheckIns: 10,
-      streak: 3,
-    },
+  await prisma.checkIn.createMany({
+    data: [
+      // John's check-ins
+      {
+        habitId: "habit-john-001",
+        userId: john.id,
+        date: getTodayDate(),
+        note: "Sudah minum 8 gelas hari ini",
+      },
+      {
+        habitId: "habit-john-002",
+        userId: john.id,
+        date: getTodayDate(),
+        note: "Baca chapter 5",
+      },
+      {
+        habitId: "habit-john-001",
+        userId: john.id,
+        date: getYesterdayDate(),
+        note: null,
+      },
+      // Jane's check-ins
+      {
+        habitId: "habit-jane-001",
+        userId: jane.id,
+        date: getTodayDate(),
+        note: "Meditasi pagi hari",
+      },
+    ],
   });
 
   // 6. Print Summary
   console.log("\n✨ Seed completed!");
   console.log("====================");
-  console.log(`📂 Categories: ${categoriesData.length}`);
+  console.log(`📂 Categories: ${systemCategories.length} system categories`);
   console.log(`👤 Users: 2 (john@example.com / jane@example.com)`);
-  console.log(`🎯 Habits: ${johnHabits.length + janeHabits.length}`);
-  console.log(`✅ Check-ins: ${checkInPromises.length}`);
-  console.log(`📊 Daily stats: 3`);
+  console.log(`🎯 Habits: ${habitsData.length} habits`);
+  console.log(`✅ Check-ins: 4 check-ins`);
   console.log("\n🔑 Login credentials:");
   console.log("- Email: john@example.com / jane@example.com");
   console.log("- Password: password123");
-  console.log("\n📅 Date format: YYYY-MM-DD (FE friendly)");
-  console.log("🔄 Streak: Real-time calculation (no DB storage)");
+  console.log("\n🏷️ Category system:");
+  console.log(
+    "- 5 system categories (Kesehatan, Keuangan, Pekerjaan, Belajar, Sosial)",
+  );
+  console.log("- User bisa buat kategori custom nanti");
   console.log("\n🚀 Happy coding!");
 }
 

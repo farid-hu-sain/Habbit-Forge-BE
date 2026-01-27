@@ -8,6 +8,7 @@ model User {
   checkIn    CheckIn[]
   dailyStats DailyStats[]
   habit      Habit[]
+  categories Category[]
   profile    Profile?
 
   @@map("users")

@@ -11,22 +11,20 @@ export class DashboardRepository {
 
   // GET Dashboard utama
   async getDashboard(userId: string) {
-    // 1. Hitung total habits user
+    // 1. Hitung total habits user (hanya yang aktif)
     const totalHabits = await this.prisma.habit.count({
-      where: { userId },
+      where: { userId, isActive: true }, // 🆕 Filter isActive: true
     });
 
-    // 2. Hitung habits aktif
-    const activeHabits = await this.prisma.habit.count({
-      where: { userId, isActive: true },
-    });
+    // 2. Hitung habits aktif (sama dengan totalHabits sekarang)
+    const activeHabits = totalHabits;
 
     // 3. Hitung total check-ins user
     const totalCheckIns = await this.prisma.checkIn.count({
       where: { userId },
     });
 
-    // 4. Hitung streak (OPTIMIZED)
+    // 4. Hitung streak (OPTIMIZED) - minimal 1 check-in per hari
     const streak = await this.calculateUserStreak(userId);
 
     return {
@@ -37,13 +35,16 @@ export class DashboardRepository {
     };
   }
 
-  // GET Habits untuk hari ini
+  // GET Habits untuk hari ini (hanya yang aktif)
   async getTodayHabits(userId: string) {
     const todayStr = getTodayDateString();
     const { start, end } = getDateRangeForQuery(todayStr);
 
     const habits = await this.prisma.habit.findMany({
-      where: { userId, isActive: true },
+      where: {
+        userId,
+        isActive: true, // 🆕 Hanya habit aktif
+      },
       include: {
         category: true,
         checkIn: {
@@ -67,14 +68,19 @@ export class DashboardRepository {
         ? formatDateForFE(habit.checkIn[0].date)
         : null,
       checkInTime: habit.checkIn[0]?.createdAt || null,
+      // 🆕 Tambah field untuk FE
+      canCheckInToday: habit.isActive && habit.checkIn.length === 0,
     }));
   }
 
   // GET Stats detail
   async getStats(userId: string) {
-    // 1. Habits per kategori
+    // 1. Habits per kategori (hanya yang aktif)
     const habits = await this.prisma.habit.findMany({
-      where: { userId },
+      where: {
+        userId,
+        isActive: true, // 🆕 Hanya habit aktif
+      },
       include: { category: true },
     });
 
@@ -100,6 +106,9 @@ export class DashboardRepository {
 
   // ========== PRIVATE HELPER METHODS ==========
 
+  /**
+   * Hitung streak user (consecutive days dengan minimal 1 check-in)
+   */
   private async calculateUserStreak(userId: string): Promise<number> {
     const sixtyDaysAgo = new Date();
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
@@ -114,7 +123,7 @@ export class DashboardRepository {
       orderBy: { date: "desc" },
     });
 
-    // Convert ke Set of dates (YYYY-MM-DD)
+    // Unique dates dengan check-in
     const checkInDates = new Set<string>();
     checkIns.forEach((checkIn) => {
       const dateStr = formatDateForFE(checkIn.date);
@@ -140,7 +149,9 @@ export class DashboardRepository {
     return streak;
   }
 
-  //Progress 7 hari terakhir
+  /**
+   * Progress 7 hari terakhir
+   */
   private async getLast7DaysStats(userId: string) {
     const checkIns = await this.prisma.checkIn.findMany({
       where: { userId },
@@ -180,13 +191,14 @@ export class DashboardRepository {
   }
 
   /**
-   * Completion rate bulan ini
+   * Completion rate bulan ini (hanya habit aktif)
    */
   private async getMonthlyCompletionRate(userId: string): Promise<number> {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const startOfMonth = parseDateFromFE(formatDateForFE(firstDayOfMonth));
 
+    // 🆕 Hanya hitung habit aktif
     const activeHabits = await this.prisma.habit.count({
       where: { userId, isActive: true },
     });

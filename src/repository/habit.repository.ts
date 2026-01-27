@@ -13,8 +13,6 @@ export interface IHabitRepository {
   update(id: string, data: Prisma.HabitUpdateInput): Promise<Habit>;
   softDelete(id: string): Promise<Habit>;
   toggleActive(id: string): Promise<Habit>;
-
-  // Untuk akses prisma dari service
   readonly prisma: PrismaClient;
 }
 

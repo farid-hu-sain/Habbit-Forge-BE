@@ -8,12 +8,11 @@ import {
   isValidDateString,
 } from "../utils/timeUtils.js";
 
-// Interface untuk response ke FE
 export interface CheckInResponse {
   id: string;
   habitId: string;
   userId: string;
-  date: string; // String untuk FE
+  date: string; // String YYYY-MM-DD untuk FE
   note: string | null;
   createdAt: Date;
   habit?: any;
@@ -66,12 +65,12 @@ export class CheckInService implements ICheckInService {
 
     const checkInDate = parseDateFromFE(checkInDateStr);
 
-    // Validasi habit masih perlu
+    // 🆕 Validasi: Habit harus aktif
     const habit = await prisma.habit.findFirst({
       where: {
         id: data.habitId,
         userId: data.userId,
-        isActive: true,
+        isActive: true, // 🆕 Pastikan habit aktif
       },
     });
 
@@ -85,9 +84,10 @@ export class CheckInService implements ICheckInService {
     }
 
     try {
-      // 🆕 Langsung create, database constraint akan handle duplikasi
+      // ✅ Database constraint: @@unique([habitId, date])
+      // akan handle race condition & duplikasi
       const input: Prisma.CheckInCreateInput = {
-        date: checkInDate,
+        date: checkInDate, // Start-of-day (00:00:00)
         habit: { connect: { id: data.habitId } },
         user: { connect: { id: data.userId } },
       };
@@ -99,13 +99,15 @@ export class CheckInService implements ICheckInService {
       const checkIn = await this.checkInRepo.create(input);
       return this.formatCheckInResponse(checkIn);
     } catch (error) {
-      // 🆕 Tangkap error constraint dari Prisma
+      // Tangkap Prisma constraint violation error
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          // P2002 = Unique constraint violation
+          // Unique constraint violation (habitId + date)
           throw new Error(`Sudah check-in pada tanggal ${checkInDateStr}`);
         }
       }
+
+      // Re-throw other errors
       throw error;
     }
   }
@@ -117,7 +119,6 @@ export class CheckInService implements ICheckInService {
   ): Promise<CheckInResponse> {
     await this.getCheckInById(id, userId);
 
-    // 🆕 FIX: Handle undefined untuk update
     const updateData: Prisma.CheckInUpdateInput = {};
 
     if (data.note !== undefined) {
@@ -140,12 +141,12 @@ export class CheckInService implements ICheckInService {
       id: checkIn.id,
       habitId: checkIn.habitId,
       userId: checkIn.userId,
-      date: formatDateForFE(checkIn.date),
+      date: formatDateForFE(checkIn.date), // Convert Date to string
       note: checkIn.note,
       createdAt: checkIn.createdAt,
     };
 
-    // Type guard untuk relations
+    // Include relations jika ada
     const checkInWithRelations = checkIn as any;
 
     if (checkInWithRelations.habit) {

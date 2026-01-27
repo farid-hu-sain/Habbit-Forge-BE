@@ -1,17 +1,16 @@
 -- CreateEnum
-CREATE TYPE "CategoryName" AS ENUM ('HEALTHY', 'FINANCE', 'WORK', 'LEARNING', 'SOCIAL');
-
--- CreateEnum
 CREATE TYPE "Frequency" AS ENUM ('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY');
 
 -- CreateTable
 CREATE TABLE "categories" (
     "id" TEXT NOT NULL,
-    "name" "CategoryName" NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "color" TEXT,
+    "name" TEXT NOT NULL,
     "description" TEXT,
+    "color" TEXT,
     "icon" TEXT,
+    "isSystem" BOOLEAN NOT NULL DEFAULT false,
+    "userId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "categories_pkey" PRIMARY KEY ("id")
 );
@@ -85,7 +84,7 @@ CREATE TABLE "users" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "categories_name_key" ON "categories"("name");
+CREATE UNIQUE INDEX "categories_name_userId_key" ON "categories"("name", "userId");
 
 -- CreateIndex
 CREATE INDEX "checkins_userId_date_idx" ON "checkins"("userId", "date");
@@ -116,6 +115,9 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+
+-- AddForeignKey
+ALTER TABLE "categories" ADD CONSTRAINT "categories_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "checkins" ADD CONSTRAINT "checkins_habitId_fkey" FOREIGN KEY ("habitId") REFERENCES "habits"("id") ON DELETE CASCADE ON UPDATE CASCADE;
