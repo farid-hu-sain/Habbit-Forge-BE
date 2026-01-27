@@ -61,16 +61,16 @@ export class CheckInService implements ICheckInService {
     const checkInDateStr =
       data.date && isValidDateString(data.date)
         ? data.date
-        : getTodayDateString();
+        : getTodayDateString(); // 🆕 UTC date string
 
-    const checkInDate = parseDateFromFE(checkInDateStr);
+    const checkInDate = parseDateFromFE(checkInDateStr); // 🆕 UTC Date
 
-    // 🆕 Validasi: Habit harus aktif
+    // Validasi habit exists, active, dan milik user
     const habit = await prisma.habit.findFirst({
       where: {
         id: data.habitId,
         userId: data.userId,
-        isActive: true, // 🆕 Pastikan habit aktif
+        isActive: true,
       },
     });
 
@@ -78,16 +78,16 @@ export class CheckInService implements ICheckInService {
       throw new Error("Habit tidak ditemukan atau tidak aktif");
     }
 
+    // Validasi habit start date (UTC comparison)
     if (checkInDate < habit.startDate) {
       const habitStartStr = formatDateForFE(habit.startDate);
       throw new Error(`Tidak bisa check-in sebelum ${habitStartStr}`);
     }
 
     try {
-      // ✅ Database constraint: @@unique([habitId, date])
-      // akan handle race condition & duplikasi
+      // Database constraint akan handle race condition & duplikasi
       const input: Prisma.CheckInCreateInput = {
-        date: checkInDate, // Start-of-day (00:00:00)
+        date: checkInDate,
         habit: { connect: { id: data.habitId } },
         user: { connect: { id: data.userId } },
       };
@@ -102,12 +102,10 @@ export class CheckInService implements ICheckInService {
       // Tangkap Prisma constraint violation error
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          // Unique constraint violation (habitId + date)
           throw new Error(`Sudah check-in pada tanggal ${checkInDateStr}`);
         }
       }
 
-      // Re-throw other errors
       throw error;
     }
   }
@@ -141,7 +139,7 @@ export class CheckInService implements ICheckInService {
       id: checkIn.id,
       habitId: checkIn.habitId,
       userId: checkIn.userId,
-      date: formatDateForFE(checkIn.date), // Convert Date to string
+      date: formatDateForFE(checkIn.date), // 🆕 UTC to string
       note: checkIn.note,
       createdAt: checkIn.createdAt,
     };

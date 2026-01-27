@@ -2,7 +2,12 @@ import type { Request, Response } from "express";
 import prisma from "../database.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { successResponse } from "../utils/response.js";
-import { formatDateForFE } from "../utils/timeUtils.js";
+import { 
+  formatDateForFE, 
+  parseDateFromFE,
+  addDays,
+  getTodayDateString,
+} from "../utils/timeUtils.js";
 
 export const getHabitStreak = asyncHandler(
   async (req: Request, res: Response) => {
@@ -13,61 +18,23 @@ export const getHabitStreak = asyncHandler(
       throw new Error("Bad request");
     }
 
-    // Validasi habit milik user
     const habit = await prisma.habit.findFirst({
       where: { id: habitId, userId },
     });
 
     if (!habit) throw new Error("Habit not found");
 
-    // Hitung streak real-time
+    // Hitung streak real-time (UTC)
     const streak = await calculateHabitStreakOptimized(habitId);
 
     successResponse(res, "Streak berhasil diambil", {
       habitId,
       streak,
       habitTitle: habit.title,
-      startDate: formatDateForFE(habit.startDate),
+      startDate: formatDateForFE(habit.startDate), // 🆕 UTC string
     });
   },
 );
-
-async function calculateHabitStreakOptimized(habitId: string): Promise<number> {
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-  ninetyDaysAgo.setHours(0, 0, 0, 0);
-
-  const checkIns = await prisma.checkIn.findMany({
-    where: {
-      habitId,
-      date: { gte: ninetyDaysAgo },
-    },
-    select: { date: true },
-    orderBy: { date: "desc" },
-  });
-
-  const checkInDates = new Set<string>();
-  checkIns.forEach((checkIn) => {
-    const dateStr = formatDateForFE(checkIn.date);
-    checkInDates.add(dateStr);
-  });
-
-  let streak = 0;
-  let currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-
-  for (let i = 0; i < 90; i++) {
-    const dateStr = formatDateForFE(currentDate);
-    if (checkInDates.has(dateStr)) {
-      streak++;
-      currentDate.setDate(currentDate.getDate() - 1);
-    } else {
-      break;
-    }
-  }
-
-  return streak;
-}
 
 export const getMonthlyStats = asyncHandler(
   async (req: Request, res: Response) => {
@@ -75,7 +42,11 @@ export const getMonthlyStats = asyncHandler(
     if (!userId) throw new Error("Unauthorized");
 
     const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const firstDay = new Date(Date.UTC(
+      today.getUTCFullYear(), 
+      today.getUTCMonth(), 
+      1
+    ));
 
     const habits = await prisma.habit.count({
       where: { userId, isActive: true },
@@ -88,11 +59,10 @@ export const getMonthlyStats = asyncHandler(
       },
     });
 
-    const days = today.getDate();
-    const completion =
-      habits > 0 ? Math.round((checkIns / (habits * days)) * 100) : 0;
+    const days = today.getUTCDate(); // 🆕 UTC day
+    const completion = habits > 0 ? Math.round((checkIns / (habits * days)) * 100) : 0;
 
-    // 🆕 Ambil semua habits aktif untuk hitung streak
+    // Ambil semua habits aktif untuk hitung streak
     const allHabits = await prisma.habit.findMany({
       where: {
         userId,
@@ -108,7 +78,7 @@ export const getMonthlyStats = asyncHandler(
       },
     });
 
-    // 🆕 Hitung streak untuk setiap habit
+    // Hitung streak untuk setiap habit
     const habitsWithStreak = await Promise.all(
       allHabits.map(async (habit) => {
         const streak = await calculateHabitStreakOptimized(habit.id);
@@ -116,11 +86,11 @@ export const getMonthlyStats = asyncHandler(
           id: habit.id,
           title: habit.title,
           streak,
-          startDate: formatDateForFE(habit.startDate),
+          startDate: formatDateForFE(habit.startDate), // 🆕 UTC string
           category: habit.category?.name || "No category",
           color: habit.category?.color || "#6B7280",
         };
-      }),
+      })
     );
 
     // Sort by streak desc dan ambil top 3
@@ -135,11 +105,46 @@ export const getMonthlyStats = asyncHandler(
       month: today.toLocaleDateString("id-ID", {
         month: "long",
         year: "numeric",
+        timeZone: "UTC", // 🆕 Display UTC month
       }),
       topHabits,
     });
   },
 );
+
+// Helper function untuk hitung streak habit (UTC)
+async function calculateHabitStreakOptimized(habitId: string): Promise<number> {
+  const ninetyDaysAgoStr = addDays(getTodayDateString(), -90); // 🆕 UTC date string
+
+  const checkIns = await prisma.checkIn.findMany({
+    where: {
+      habitId,
+      date: { gte: parseDateFromFE(ninetyDaysAgoStr) }, // 🆕 UTC date
+    },
+    select: { date: true },
+    orderBy: { date: "desc" },
+  });
+
+  const checkInDates = new Set<string>();
+  checkIns.forEach((checkIn) => {
+    const dateStr = formatDateForFE(checkIn.date); // 🆕 UTC date string
+    checkInDates.add(dateStr);
+  });
+
+  let streak = 0;
+  let currentDateStr = getTodayDateString(); // 🆕 UTC today
+
+  for (let i = 0; i < 90; i++) {
+    if (checkInDates.has(currentDateStr)) {
+      streak++;
+      currentDateStr = addDays(currentDateStr, -1); // 🆕 Mundur 1 hari (UTC)
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
 
 export const getWeeklyProgress = asyncHandler(
   async (req: Request, res: Response) => {
@@ -150,51 +155,50 @@ export const getWeeklyProgress = asyncHandler(
       throw new Error("Bad request");
     }
 
-    // Validasi ownership
     const habit = await prisma.habit.findFirst({
       where: { id: habitId, userId },
     });
 
     if (!habit) throw new Error("Habit not found");
 
-    // Ambil check-ins 7 hari terakhir
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
+    // Ambil check-ins 7 hari terakhir (UTC)
+    const sevenDaysAgoStr = addDays(getTodayDateString(), -6); // 🆕 UTC date string
 
     const checkIns = await prisma.checkIn.findMany({
       where: {
         habitId,
-        date: { gte: sevenDaysAgo },
+        date: { gte: parseDateFromFE(sevenDaysAgoStr) }, // 🆕 UTC date
       },
       select: { date: true },
     });
 
-    // Group by day
+    // Group by day (UTC dates)
     const checkInsByDay = new Set<string>();
     checkIns.forEach((checkIn) => {
-      const dateStr = formatDateForFE(checkIn.date);
+      const dateStr = formatDateForFE(checkIn.date); // 🆕 UTC date string
       checkInsByDay.add(dateStr);
     });
 
-    // Format response
+    // Format response (7 hari terakhir UTC)
     const weekProgress = [];
-    const today = new Date();
+    const todayStr = getTodayDateString(); // 🆕 UTC today
 
     for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-
-      const dateStr = formatDateForFE(date);
+      const dateStr = addDays(todayStr, -i); // 🆕 UTC date string
       const hasCheckIn = checkInsByDay.has(dateStr);
+      const dateObj = parseDateFromFE(dateStr);
 
       weekProgress.push({
         date: dateStr,
-        day: date.toLocaleDateString("id-ID", { weekday: "short" }),
+        day: dateObj.toLocaleDateString("id-ID", { 
+          weekday: "short",
+          timeZone: "UTC"
+        }),
         completed: hasCheckIn,
-        displayDate: date.toLocaleDateString("id-ID", {
+        displayDate: dateObj.toLocaleDateString("id-ID", {
           day: "numeric",
           month: "short",
+          timeZone: "UTC"
         }),
       });
     }
@@ -202,13 +206,13 @@ export const getWeeklyProgress = asyncHandler(
     const completedDays = weekProgress.filter((day) => day.completed).length;
     const weeklyCompletion = Math.round((completedDays / 7) * 100);
 
-    // 🆕 Hitung streak real-time untuk habit ini
+    // Hitung streak real-time (UTC)
     const streak = await calculateHabitStreakOptimized(habitId);
 
     successResponse(res, "Progress mingguan berhasil diambil", {
       habitId,
       habitTitle: habit.title,
-      startDate: formatDateForFE(habit.startDate),
+      startDate: formatDateForFE(habit.startDate), // 🆕 UTC string
       weekProgress,
       completedDays,
       weeklyCompletion,

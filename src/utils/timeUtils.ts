@@ -1,15 +1,9 @@
-// TIME UTILITY FUNCTIONS FOR HABIT TRACKER
-// Meng-handle konversi antara FE (YYYY-MM-DD) dan BE (DateTime)
-
 /**
- * Convert FE date string (YYYY-MM-DD) to Date object (start of day in WIB)
- * @param dateString Format: "2024-01-15"
- * @returns Date object with time set to 00:00:00
+ * Parse "2024-01-15" → Date UTC
  */
 export const parseDateFromFE = (dateString: string): Date => {
-  // Validasi format dasar
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    throw new Error(`Format tanggal tidak valid: ${dateString}. Gunakan YYYY-MM-DD`);
+    throw new Error(`Format tanggal tidak valid: ${dateString}`);
   }
   
   const parts = dateString.split('-');
@@ -23,13 +17,13 @@ export const parseDateFromFE = (dateString: string): Date => {
   const monthStr = parts[1];
   const dayStr = parts[2];
   
-  // Validasi part tidak kosong
+  // Validasi tidak kosong
   if (!yearStr || !monthStr || !dayStr) {
     throw new Error(`Format tanggal tidak valid: ${dateString}`);
   }
   
   const year = parseInt(yearStr, 10);
-  const month = parseInt(monthStr, 10) - 1; // JavaScript month 0-based
+  const month = parseInt(monthStr, 10);
   const day = parseInt(dayStr, 10);
   
   // Validasi angka
@@ -38,54 +32,65 @@ export const parseDateFromFE = (dateString: string): Date => {
   }
   
   // Validasi bulan (1-12)
-  if (month < 0 || month > 11) {
-    throw new Error(`Bulan tidak valid: ${month + 1}`);
+  if (month < 1 || month > 12) {
+    throw new Error(`Bulan tidak valid: ${month}`);
   }
   
-  // Validasi tanggal (1-31, validasi lebih detail nanti)
+  // Validasi tanggal (1-31)
   if (day < 1 || day > 31) {
     throw new Error(`Tanggal tidak valid: ${day}`);
   }
   
-  // Buat Date object (timezone akan mengikuti server, sudah WIB karena TZ=Asia/Jakarta)
-  const date = new Date(year, month, day, 0, 0, 0, 0);
-  
-  // Validasi kembali (untuk kasus seperti 2024-02-31)
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== month ||
-    date.getDate() !== day
-  ) {
-    throw new Error(`Tanggal tidak valid: ${dateString}`);
-  }
-  
-  return date;
+  // Buat Date di UTC
+  return new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
 };
 
 /**
- * Format Date object to YYYY-MM-DD string for FE
- * @param date Date object
- * @returns String format "2024-01-15"
+ * Format Date → "2024-01-15" string
  */
 export const formatDateForFE = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export const addDays = (dateString: string, days: number): string => {
+  const date = parseDateFromFE(dateString);
+  date.setUTCDate(date.getUTCDate() + days);
+  return formatDateForFE(date);
+};
+
+/**
+ * Get yesterday's date string (UTC)
+ */
+export const getYesterdayDateString = (): string => {
+  return addDays(getTodayDateString(), -1);
+};
+
+/**
+ * Get today's date in UTC "2024-01-15"
+ */
+export const getTodayDateString = (): string => {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(now.getUTCDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
 /**
- * Get today's date in YYYY-MM-DD format
- * @returns Today's date as string "2024-01-15"
+ * Get date range for query (UTC start/end of day)
  */
-export const getTodayDateString = (): string => {
-  const today = new Date();
-  return formatDateForFE(today);
+export const getDateRangeForQuery = (dateString: string): { start: Date; end: Date } => {
+  const start = parseDateFromFE(dateString);
+  const end = new Date(start);
+  end.setUTCHours(23, 59, 59, 999);
+  return { start, end };
 };
 
 /**
- * Validate if date string is valid YYYY-MM-DD format
+ * Validate date string format
  */
 export const isValidDateString = (dateString: string): boolean => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return false;
@@ -99,53 +104,8 @@ export const isValidDateString = (dateString: string): boolean => {
 };
 
 /**
- * Check if two date strings represent the same day
- */
-export const isSameDay = (dateStr1: string, dateStr2: string): boolean => {
-  return dateStr1 === dateStr2;
-};
-
-/**
- * Get date range for database query (start and end of day)
- */
-export const getDateRangeForQuery = (dateString: string): { start: Date; end: Date } => {
-  const start = parseDateFromFE(dateString);
-  const end = new Date(start);
-  end.setHours(23, 59, 59, 999);
-  
-  return { start, end };
-};
-
-/**
- * Get today's date range for queries (for backward compatibility)
+ * Get today's date range (backward compatibility)
  */
 export const getTodayRange = () => {
   return getDateRangeForQuery(getTodayDateString());
-};
-
-/**
- * Get yesterday's date string
- */
-export const getYesterdayDateString = (): string => {
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  
-  return formatDateForFE(yesterday);
-};
-
-/**
- * Get start of day Date object from date string
- */
-export const getStartOfDay = (dateString: string): Date => {
-  return parseDateFromFE(dateString);
-};
-
-/**
- * Get end of day Date object from date string
- */
-export const getEndOfDay = (dateString: string): Date => {
-  const date = parseDateFromFE(dateString);
-  date.setHours(23, 59, 59, 999);
-  return date;
 };

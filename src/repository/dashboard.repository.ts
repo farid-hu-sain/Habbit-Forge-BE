@@ -4,6 +4,7 @@ import {
   formatDateForFE,
   getDateRangeForQuery,
   parseDateFromFE,
+  addDays,
 } from "../utils/timeUtils.js";
 
 export class DashboardRepository {
@@ -13,7 +14,7 @@ export class DashboardRepository {
   async getDashboard(userId: string) {
     // 1. Hitung total habits user (hanya yang aktif)
     const totalHabits = await this.prisma.habit.count({
-      where: { userId, isActive: true }, // 🆕 Filter isActive: true
+      where: { userId, isActive: true },
     });
 
     // 2. Hitung habits aktif (sama dengan totalHabits sekarang)
@@ -24,7 +25,7 @@ export class DashboardRepository {
       where: { userId },
     });
 
-    // 4. Hitung streak (OPTIMIZED) - minimal 1 check-in per hari
+    // 4. Hitung streak (minimal 1 check-in per hari) - UTC
     const streak = await this.calculateUserStreak(userId);
 
     return {
@@ -35,15 +36,15 @@ export class DashboardRepository {
     };
   }
 
-  // GET Habits untuk hari ini (hanya yang aktif)
+  // GET Habits untuk hari ini (hanya yang aktif) - UTC
   async getTodayHabits(userId: string) {
-    const todayStr = getTodayDateString();
+    const todayStr = getTodayDateString(); // 🆕 UTC today
     const { start, end } = getDateRangeForQuery(todayStr);
 
     const habits = await this.prisma.habit.findMany({
       where: {
         userId,
-        isActive: true, // 🆕 Hanya habit aktif
+        isActive: true,
       },
       include: {
         category: true,
@@ -65,10 +66,9 @@ export class DashboardRepository {
       category: habit.category?.name || "No category",
       isCompleted: habit.checkIn.length > 0,
       checkInDate: habit.checkIn[0]
-        ? formatDateForFE(habit.checkIn[0].date)
+        ? formatDateForFE(habit.checkIn[0].date) // 🆕 UTC to string
         : null,
       checkInTime: habit.checkIn[0]?.createdAt || null,
-      // 🆕 Tambah field untuk FE
       canCheckInToday: habit.isActive && habit.checkIn.length === 0,
     }));
   }
@@ -79,7 +79,7 @@ export class DashboardRepository {
     const habits = await this.prisma.habit.findMany({
       where: {
         userId,
-        isActive: true, // 🆕 Hanya habit aktif
+        isActive: true,
       },
       include: { category: true },
     });
@@ -91,10 +91,10 @@ export class DashboardRepository {
         (habitsByCategory[categoryName] || 0) + 1;
     });
 
-    // 2. Progress 7 hari terakhir
+    // 2. Progress 7 hari terakhir (UTC)
     const last7Days = await this.getLast7DaysStats(userId);
 
-    // 3. Completion rate bulan ini
+    // 3. Completion rate bulan ini (UTC)
     const monthlyCompletion = await this.getMonthlyCompletionRate(userId);
 
     return {
@@ -107,40 +107,37 @@ export class DashboardRepository {
   // ========== PRIVATE HELPER METHODS ==========
 
   /**
-   * Hitung streak user (consecutive days dengan minimal 1 check-in)
+   * Hitung streak user (consecutive days dengan minimal 1 check-in) - UTC
    */
   private async calculateUserStreak(userId: string): Promise<number> {
-    const sixtyDaysAgo = new Date();
-    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-    sixtyDaysAgo.setHours(0, 0, 0, 0);
+    const sixtyDaysAgoStr = addDays(getTodayDateString(), -60); // 🆕 UTC date string
 
     const checkIns = await this.prisma.checkIn.findMany({
       where: {
         userId,
-        date: { gte: sixtyDaysAgo },
+        date: {
+          gte: parseDateFromFE(sixtyDaysAgoStr), // 🆕 UTC date
+        },
       },
       select: { date: true },
       orderBy: { date: "desc" },
     });
 
-    // Unique dates dengan check-in
+    // Unique dates dengan check-in (UTC dates)
     const checkInDates = new Set<string>();
     checkIns.forEach((checkIn) => {
-      const dateStr = formatDateForFE(checkIn.date);
+      const dateStr = formatDateForFE(checkIn.date); // 🆕 UTC date string
       checkInDates.add(dateStr);
     });
 
-    // Hitung streak
+    // Hitung streak mundur dari hari ini (UTC)
     let streak = 0;
-    let currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
+    let currentDateStr = getTodayDateString(); // 🆕 UTC today
 
     for (let i = 0; i < 60; i++) {
-      const dateStr = formatDateForFE(currentDate);
-
-      if (checkInDates.has(dateStr)) {
+      if (checkInDates.has(currentDateStr)) {
         streak++;
-        currentDate.setDate(currentDate.getDate() - 1);
+        currentDateStr = addDays(currentDateStr, -1); // 🆕 Mundur 1 hari (UTC)
       } else {
         break;
       }
@@ -150,7 +147,7 @@ export class DashboardRepository {
   }
 
   /**
-   * Progress 7 hari terakhir
+   * Progress 7 hari terakhir (UTC)
    */
   private async getLast7DaysStats(userId: string) {
     const checkIns = await this.prisma.checkIn.findMany({
@@ -158,31 +155,27 @@ export class DashboardRepository {
       select: { date: true },
     });
 
-    // Kelompokkan per hari
+    // Kelompokkan per hari (UTC dates)
     const checkInsByDay = new Map<string, number>();
     checkIns.forEach((checkIn) => {
-      const dateStr = formatDateForFE(checkIn.date);
+      const dateStr = formatDateForFE(checkIn.date); // 🆕 UTC date string
       checkInsByDay.set(dateStr, (checkInsByDay.get(dateStr) || 0) + 1);
     });
 
-    // Format untuk 7 hari terakhir
+    // Format untuk 7 hari terakhir (UTC)
     const last7Days = [];
-    const today = new Date();
+    const todayStr = getTodayDateString(); // 🆕 UTC today
 
     for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-
-      const dateStr = formatDateForFE(date);
+      const dateStr = addDays(todayStr, -i); // 🆕 UTC date string
       const checkInsCount = checkInsByDay.get(dateStr) || 0;
+
+      // Buat Date object untuk format display (pakai UTC)
+      const dateObj = parseDateFromFE(dateStr);
 
       last7Days.push({
         date: dateStr,
-        dateDisplay: date.toLocaleDateString("id-ID", {
-          weekday: "short",
-          day: "numeric",
-          month: "short",
-        }),
+        dateDisplay: this.formatDateDisplay(dateObj),
         checkIns: checkInsCount,
       });
     }
@@ -191,14 +184,17 @@ export class DashboardRepository {
   }
 
   /**
-   * Completion rate bulan ini (hanya habit aktif)
+   * Completion rate bulan ini (UTC)
    */
   private async getMonthlyCompletionRate(userId: string): Promise<number> {
     const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const startOfMonth = parseDateFromFE(formatDateForFE(firstDayOfMonth));
+    const firstDayOfMonth = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1),
+    );
 
-    // 🆕 Hanya hitung habit aktif
+    const startOfMonth = firstDayOfMonth;
+
+    // Hanya hitung habit aktif
     const activeHabits = await this.prisma.habit.count({
       where: { userId, isActive: true },
     });
@@ -212,9 +208,22 @@ export class DashboardRepository {
       },
     });
 
-    const daysInMonth = today.getDate();
+    const daysInMonth = today.getUTCDate(); // 🆕 UTC day of month
     const possibleCheckIns = activeHabits * daysInMonth;
 
     return Math.round((actualCheckIns / possibleCheckIns) * 100);
+  }
+
+  /**
+   * Format date untuk display (localized)
+   */
+  private formatDateDisplay(date: Date): string {
+    // Gunakan locale Indonesia, tapi date tetap UTC
+    return date.toLocaleDateString("id-ID", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC", // 🆕 Tampilkan sebagai UTC
+    });
   }
 }
