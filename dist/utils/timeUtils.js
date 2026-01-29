@@ -5,7 +5,7 @@ export const parseDateFromFE = (dateString) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
         throw new Error(`Format tanggal tidak valid: ${dateString}`);
     }
-    const parts = dateString.split('-');
+    const parts = dateString.split("-");
     // Pastikan ada 3 parts
     if (parts.length !== 3) {
         throw new Error(`Format tanggal tidak valid: ${dateString}`);
@@ -40,8 +40,8 @@ export const parseDateFromFE = (dateString) => {
  */
 export const formatDateForFE = (date) => {
     const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
 };
 export const addDays = (dateString, days) => {
@@ -61,8 +61,8 @@ export const getYesterdayDateString = () => {
 export const getTodayDateString = () => {
     const now = new Date();
     const year = now.getUTCFullYear();
-    const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(now.getUTCDate()).padStart(2, '0');
+    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(now.getUTCDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
 };
 /**
@@ -93,4 +93,12 @@ export const isValidDateString = (dateString) => {
  */
 export const getTodayRange = () => {
     return getDateRangeForQuery(getTodayDateString());
+};
+export const formatToIndonesianDate = (utcDate) => {
+    return utcDate.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Asia/Jakarta",
+    });
 };

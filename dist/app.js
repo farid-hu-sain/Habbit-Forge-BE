@@ -1,6 +1,3 @@
-if (!process.env.TZ) {
-    process.env.TZ = "Asia/Jakarta";
-}
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";

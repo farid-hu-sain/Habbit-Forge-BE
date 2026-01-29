@@ -1,4 +1,4 @@
-import { parseDateFromFE, formatDateForFE, getTodayDateString, getDateRangeForQuery, isValidDateString, } from "../utils/timeUtils.js";
+import { parseDateFromFE, formatDateForFE, getTodayDateString, getDateRangeForQuery, isValidDateString, formatToIndonesianDate, } from "../utils/timeUtils.js";
 export class HabitService {
     habitRepo;
     constructor(habitRepo) {
@@ -111,6 +111,7 @@ export class HabitService {
             isActive: habit.isActive,
             category: habit.category,
             startDate: formatDateForFE(habit.startDate),
+            startDateDisplay: formatToIndonesianDate(habit.startDate),
             createdAt: habit.createdAt,
             isCheckedToday: habit.checkIn.length > 0,
             todayCheckIn: habit.checkIn[0]

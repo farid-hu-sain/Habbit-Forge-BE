@@ -1,8 +1,7 @@
 import { Frequency, Category } from "@prisma/client";
 import { hash } from "bcrypt";
 import { parseDateFromFE, getTodayDateString, getYesterdayDateString, } from "../utils/timeUtils.js";
-import prismaInstance from "../database.js";
-const prisma = prismaInstance;
+import prisma from "../database.js";
 async function main() {
     console.log("🌱 Starting seed...");
     // Clear existing data
