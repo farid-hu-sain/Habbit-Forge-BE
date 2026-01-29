@@ -8,9 +8,9 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma generate && prisma migrate dev",
     "prisma:reset": "prisma migrate reset",
-    "seed": "cross-env TZ=Asia/Jakarta tsx src/prisma/seeder.ts",
-    "dev": "cross-env TZ=Asia/Jakarta tsx watch src/index.ts",
-    "start": "cross-env TZ=Asia/Jakarta node dist/index.js",
+    "seed": "tsx src/prisma/seeder.ts",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
     "build": "tsc",
     "test": "jest"
   },

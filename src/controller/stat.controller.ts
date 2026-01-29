@@ -31,7 +31,8 @@ export const getHabitStreak = asyncHandler(
       habitId,
       streak,
       habitTitle: habit.title,
-      startDate: formatDateForFE(habit.startDate), // 🆕 UTC string
+      startDate: formatDateForFE(habit.startDate),
+      startDateDisplay: formatToIndonesianDate(habit.startDate), // ✅ Added display date
     });
   },
 );
@@ -42,7 +43,7 @@ export const getMonthlyStats = asyncHandler(
     if (!userId) throw new Error("Unauthorized");
 
     const today = new Date();
-    const firstDay = new Date(
+    const firstDayOfMonth = new Date(
       Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1),
     );
 
@@ -53,13 +54,13 @@ export const getMonthlyStats = asyncHandler(
     const checkIns = await prisma.checkIn.count({
       where: {
         userId,
-        date: { gte: firstDay },
+        date: { gte: firstDayOfMonth },
       },
     });
 
-    const days = today.getUTCDate(); // 🆕 UTC day
+    const daysInMonth = today.getUTCDate();
     const completion =
-      habits > 0 ? Math.round((checkIns / (habits * days)) * 100) : 0;
+      habits > 0 ? Math.round((checkIns / (habits * daysInMonth)) * 100) : 0;
 
     // Ambil semua habits aktif untuk hitung streak
     const allHabits = await prisma.habit.findMany({
@@ -71,7 +72,7 @@ export const getMonthlyStats = asyncHandler(
         id: true,
         title: true,
         startDate: true,
-        category: true, // ✅ Langsung enum value
+        category: true,
       },
     });
 
@@ -84,7 +85,8 @@ export const getMonthlyStats = asyncHandler(
           title: habit.title,
           streak,
           startDate: formatDateForFE(habit.startDate),
-          category: habit.category || "No category", // ✅ Langsung enum value
+          startDateDisplay: formatToIndonesianDate(habit.startDate), // ✅ Added
+          category: habit.category || "No category",
         };
       }),
     );
@@ -101,7 +103,7 @@ export const getMonthlyStats = asyncHandler(
       month: today.toLocaleDateString("id-ID", {
         month: "long",
         year: "numeric",
-        timeZone: "UTC", // 🆕 Display UTC month
+        timeZone: "Asia/Jakarta", // ✅ FIXED: Display month in Indonesia time
       }),
       topHabits,
     });
@@ -110,12 +112,12 @@ export const getMonthlyStats = asyncHandler(
 
 // Helper function untuk hitung streak habit (UTC)
 async function calculateHabitStreakOptimized(habitId: string): Promise<number> {
-  const ninetyDaysAgoStr = addDays(getTodayDateString(), -90); // 🆕 UTC date string
+  const ninetyDaysAgoStr = addDays(getTodayDateString(), -90);
 
   const checkIns = await prisma.checkIn.findMany({
     where: {
       habitId,
-      date: { gte: parseDateFromFE(ninetyDaysAgoStr) }, // 🆕 UTC date
+      date: { gte: parseDateFromFE(ninetyDaysAgoStr) },
     },
     select: { date: true },
     orderBy: { date: "desc" },
@@ -123,17 +125,17 @@ async function calculateHabitStreakOptimized(habitId: string): Promise<number> {
 
   const checkInDates = new Set<string>();
   checkIns.forEach((checkIn) => {
-    const dateStr = formatDateForFE(checkIn.date); // 🆕 UTC date string
+    const dateStr = formatDateForFE(checkIn.date);
     checkInDates.add(dateStr);
   });
 
   let streak = 0;
-  let currentDateStr = getTodayDateString(); // 🆕 UTC today
+  let currentDateStr = getTodayDateString();
 
   for (let i = 0; i < 90; i++) {
     if (checkInDates.has(currentDateStr)) {
       streak++;
-      currentDateStr = addDays(currentDateStr, -1); // 🆕 Mundur 1 hari (UTC)
+      currentDateStr = addDays(currentDateStr, -1);
     } else {
       break;
     }
@@ -158,12 +160,12 @@ export const getWeeklyProgress = asyncHandler(
     if (!habit) throw new Error("Habit not found");
 
     // Ambil check-ins 7 hari terakhir (UTC)
-    const sevenDaysAgoStr = addDays(getTodayDateString(), -6); // 🆕 UTC date string
+    const sevenDaysAgoStr = addDays(getTodayDateString(), -6);
 
     const checkIns = await prisma.checkIn.findMany({
       where: {
         habitId,
-        date: { gte: parseDateFromFE(sevenDaysAgoStr) }, // 🆕 UTC date
+        date: { gte: parseDateFromFE(sevenDaysAgoStr) },
       },
       select: { date: true },
     });
@@ -171,30 +173,31 @@ export const getWeeklyProgress = asyncHandler(
     // Group by day (UTC dates)
     const checkInsByDay = new Set<string>();
     checkIns.forEach((checkIn) => {
-      const dateStr = formatDateForFE(checkIn.date); // 🆕 UTC date string
+      const dateStr = formatDateForFE(checkIn.date);
       checkInsByDay.add(dateStr);
     });
 
     // Format response (7 hari terakhir UTC)
     const weekProgress = [];
-    const todayStr = getTodayDateString(); // 🆕 UTC today
+    const todayStr = getTodayDateString();
 
     for (let i = 6; i >= 0; i--) {
-      const dateStr = addDays(todayStr, -i); // 🆕 UTC date string
+      const dateStr = addDays(todayStr, -i);
       const hasCheckIn = checkInsByDay.has(dateStr);
       const dateObj = parseDateFromFE(dateStr);
 
       weekProgress.push({
         date: dateStr,
+        dateDisplay: formatToIndonesianDate(dateObj), // ✅ FIXED: Use helper function
         day: dateObj.toLocaleDateString("id-ID", {
           weekday: "short",
-          timeZone: "UTC",
+          timeZone: "Asia/Jakarta", // ✅ FIXED: Convert to WIB
         }),
         completed: hasCheckIn,
         displayDate: dateObj.toLocaleDateString("id-ID", {
           day: "numeric",
           month: "short",
-          timeZone: "UTC",
+          timeZone: "Asia/Jakarta", // ✅ FIXED: Convert to WIB
         }),
       });
     }
@@ -208,7 +211,8 @@ export const getWeeklyProgress = asyncHandler(
     successResponse(res, "Progress mingguan berhasil diambil", {
       habitId,
       habitTitle: habit.title,
-      startDate: formatDateForFE(habit.startDate), // 🆕 UTC string
+      startDate: formatDateForFE(habit.startDate),
+      startDateDisplay: formatToIndonesianDate(habit.startDate), // ✅ Added
       weekProgress,
       completedDays,
       weeklyCompletion,
@@ -216,3 +220,13 @@ export const getWeeklyProgress = asyncHandler(
     });
   },
 );
+
+// ✅ NEW HELPER: Format UTC date to Indonesian date string
+function formatToIndonesianDate(utcDate: Date): string {
+  return utcDate.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  });
+}

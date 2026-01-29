@@ -1,7 +1,3 @@
-if (!process.env.TZ) {
-  process.env.TZ = "Asia/Jakarta";
-}
-
 import express, {
   type Application,
   type Request,

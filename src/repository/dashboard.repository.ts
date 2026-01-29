@@ -30,7 +30,7 @@ export class DashboardRepository {
   }
 
   async getTodayHabits(userId: string) {
-    const todayStr = getTodayDateString();
+    const todayStr = getTodayDateString(); // UTC date string
     const { start, end } = getDateRangeForQuery(todayStr);
 
     const habits = await this.prisma.habit.findMany({
@@ -186,11 +186,12 @@ export class DashboardRepository {
   }
 
   private formatDateDisplay(date: Date): string {
+    // Convert UTC date to Indonesia time for display
     return date.toLocaleDateString("id-ID", {
       weekday: "short",
       day: "numeric",
       month: "short",
-      timeZone: "UTC",
+      timeZone: "Asia/Jakarta",
     });
   }
 }

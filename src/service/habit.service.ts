@@ -6,6 +6,7 @@ import {
   getTodayDateString,
   getDateRangeForQuery,
   isValidDateString,
+  formatToIndonesianDate,
 } from "../utils/timeUtils.js";
 
 export interface HabitResponse {
@@ -231,6 +232,7 @@ export class HabitService implements IHabitService {
       isActive: habit.isActive,
       category: habit.category,
       startDate: formatDateForFE(habit.startDate),
+      startDateDisplay: formatToIndonesianDate(habit.startDate),
       createdAt: habit.createdAt,
       isCheckedToday: habit.checkIn.length > 0,
       todayCheckIn: habit.checkIn[0]

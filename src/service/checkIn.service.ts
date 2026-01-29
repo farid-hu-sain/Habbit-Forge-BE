@@ -8,11 +8,22 @@ import {
   isValidDateString,
 } from "../utils/timeUtils.js";
 
+// ✅ NEW HELPER: Format UTC date to Indonesian display
+const formatToIndonesianDate = (utcDate: Date): string => {
+  return utcDate.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  });
+};
+
 export interface CheckInResponse {
   id: string;
   habitId: string;
   userId: string;
-  date: string; // String YYYY-MM-DD untuk FE
+  date: string; // String YYYY-MM-DD (UTC) untuk FE
+  dateDisplay: string; // ✅ ADDED: Display date in Indonesian format
   note: string | null;
   createdAt: Date;
   habit?: any;
@@ -61,9 +72,9 @@ export class CheckInService implements ICheckInService {
     const checkInDateStr =
       data.date && isValidDateString(data.date)
         ? data.date
-        : getTodayDateString(); // 🆕 UTC date string
+        : getTodayDateString(); // UTC date string
 
-    const checkInDate = parseDateFromFE(checkInDateStr); // 🆕 UTC Date
+    const checkInDate = parseDateFromFE(checkInDateStr); // UTC Date
 
     // Validasi habit exists, active, dan milik user
     const habit = await prisma.habit.findFirst({
@@ -81,7 +92,10 @@ export class CheckInService implements ICheckInService {
     // Validasi habit start date (UTC comparison)
     if (checkInDate < habit.startDate) {
       const habitStartStr = formatDateForFE(habit.startDate);
-      throw new Error(`Tidak bisa check-in sebelum ${habitStartStr}`);
+      const habitStartDisplay = formatToIndonesianDate(habit.startDate); // ✅ ADDED
+      throw new Error(
+        `Tidak bisa check-in sebelum ${habitStartStr} (${habitStartDisplay})`, // ✅ IMPROVED error message
+      );
     }
 
     try {
@@ -102,7 +116,10 @@ export class CheckInService implements ICheckInService {
       // Tangkap Prisma constraint violation error
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === "P2002") {
-          throw new Error(`Sudah check-in pada tanggal ${checkInDateStr}`);
+          const checkInDisplay = formatToIndonesianDate(checkInDate); // ✅ ADDED
+          throw new Error(
+            `Sudah check-in pada tanggal ${checkInDateStr} (${checkInDisplay})`, // ✅ IMPROVED error message
+          );
         }
       }
 
@@ -139,7 +156,8 @@ export class CheckInService implements ICheckInService {
       id: checkIn.id,
       habitId: checkIn.habitId,
       userId: checkIn.userId,
-      date: formatDateForFE(checkIn.date), // 🆕 UTC to string
+      date: formatDateForFE(checkIn.date), // UTC date string
+      dateDisplay: formatToIndonesianDate(checkIn.date), // ✅ ADDED: Indonesian display date
       note: checkIn.note,
       createdAt: checkIn.createdAt,
     };
@@ -148,7 +166,12 @@ export class CheckInService implements ICheckInService {
     const checkInWithRelations = checkIn as any;
 
     if (checkInWithRelations.habit) {
-      response.habit = checkInWithRelations.habit;
+      response.habit = {
+        ...checkInWithRelations.habit,
+        startDateDisplay: formatToIndonesianDate(
+          checkInWithRelations.habit.startDate,
+        ),
+      };
     }
 
     if (checkInWithRelations.user) {
